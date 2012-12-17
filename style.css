@@ -252,35 +252,26 @@ m
 
 
 #footer {
-  clear:both;
-	height: 35px;
+  	clear:both;
 	width: 100%;
 	background: #f5f5f5;
-  border-top:1px solid #ebebeb;	
-	margin: 20px 0 auto;
-	position:relative;
+  	border-top:1px solid #ebebeb;	
+	margin: 20px;
+	text-align:center
 }
 
 #footer-info {
 	font: 500 11px  Verdana, Arial, Helvetica, sans-serif;
-	color:#838383;
-	margin:auto;
-	width: 964px;
+	color: #838383;
+	margin: 20px auto 20px auto;
 	padding: 10px;
+	text-align:center
 }
 
 #footer-info a{
 	text-decoration:none;
 }	
 
-#footer-info span#copyright {
-	float: left;
-}
-
-#footer-info span#follow-us {
-	float: right;
-	text-align: right;
-}
 
 /*logo*/
 /*////////////////////////////////////////////////////////////////////////////////////////////*/
