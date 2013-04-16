@@ -1,25 +1,34 @@
 <?php get_header(); ?>
 
 <!--content-->
-<DIV id="content">
+<div id="content">
 		
-	<DIV id="left-col">
+	<div id="left-col">
 			
 
 			<?php if ( have_posts() ) while ( have_posts() ) : the_post(); ?>
 			
 				
-					<DIV class="post-head">
+					<div class="post-head">
 					
 						<H1><?php the_title(); ?></H1>
 					
-					</DIV><!--post-heading end-->
+					</div><!--post-heading end-->
 
-			<DIV class="meta-data">
+			<div class="meta-data">
 			
-			<?php the_time(__ ( 'j M y', 'optimizare')); ?> under <?php the_category(', '); ?> | <?php comments_popup_link( __( 'Leave a comment', 'optimizare' ), __( '1 Comment', 'optimizare' ), __( '% Comments', 'optimizare' ) ); ?>
+			<?php the_time(__ ( 'j M y', 'optimizare')); ?> under <?php the_category(', '); ?> 
 			
-			</DIV><!--meta data end-->
+			<?php
+				if(comments_open()){
+			?>
+					|
+			<?php 
+					comments_popup_link( __( 'Leave a comment', 'optimizare' ), __( '1 Comment', 'optimizare' ), __( '% Comments', 'optimizare' ) ); 
+				}
+			?>
+			
+			</div><!--meta data end-->
 
 			<div class="post-entry">
 
@@ -35,13 +44,13 @@
 
 <?php endwhile; ?>
 
-</DIV> <!--left-col end-->
+</div> <!--left-col end-->
 
 <?php get_sidebar(); ?>
 
-</DIV> <!--content end-->
+</div> <!--content end-->
 	              <div class="clear"></div>
-</DIV>
+</div>
 <!--wrapper end-->
 
 <?php get_footer(); ?>

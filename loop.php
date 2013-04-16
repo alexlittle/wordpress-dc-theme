@@ -21,8 +21,16 @@
 			
 			<div class="meta-data">
 			
-			<?php the_time(__ ( 'j M y', 'optimizare')); ?> under <?php the_category(', '); ?> | <?php comments_popup_link( __( 'Leave a comment', 'optimizare' ), __( '1 Comment', 'optimizare' ), __( '% Comments', 'optimizare' ) ); ?>
+			<?php the_time(__ ( 'j M y', 'optimizare')); ?> under <?php the_category(', '); ?> 
 			
+			<?php
+				if(comments_open()){
+			?>
+					|
+			<?php 
+					comments_popup_link( __( 'Leave a comment', 'optimizare' ), __( '1 Comment', 'optimizare' ), __( '% Comments', 'optimizare' ) ); 
+				}
+			?>
 			</div><!--meta data end-->
 
 <div class="post-entry">
