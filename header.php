@@ -19,7 +19,7 @@
 	} ?></title>
 		
 <link rel="shortcut icon" href="<?php bloginfo('template_url'); ?>/images/favicon.ico"/>		
-<link rel="stylesheet" type="text/css" media="all" href="<?php bloginfo( 'stylesheet_url' ); ?>" />
+<link rel="stylesheet" type="text/css" media="all" href="<?php bloginfo('template_url'); ?>/style-20131103.css" />
 
 <!--[if IE 6]>
 	<link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri(); ?>/css/ie6.css" />
