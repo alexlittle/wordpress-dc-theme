@@ -61,6 +61,7 @@ h1 {
 
 h2 {
 	font-size: 1.5em;
+	line-height:1.2em;
     margin:20px 0 10px 0;
 	}
 
@@ -278,7 +279,7 @@ div.footer-col {
 	float: left;	
 }
 
-div.footer-col ul, li {
+div.footer-col ul li {
 	list-style-type: none;
 }
 
