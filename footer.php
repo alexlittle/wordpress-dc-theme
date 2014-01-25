@@ -24,7 +24,8 @@
 					<ul>
 						<li><a class="rss" href="<?php bloginfo('rss2_url'); ?>"><img src="<?php bloginfo('template_url'); ?>/images/feed-icon-28x28.png"/>RSS</a></li>
 						<li><a href="https://github.com/DigitalCampus/"><img src="<?php bloginfo('template_url'); ?>/images/github-icon.png"/>GitHub</a></li>
-						<?php if($options['twitter_url'] <> '') : ?><li><a href="<?php echo($options['twitter_url']); ?>" rel="nofollow"  title="Follow us on twitter.">Twitter</a></li><?php endif; ?>
+						<li><a href="https://twitter.com/digicampusteam" rel="nofollow"  title="Follow us on twitter."><img src="<?php bloginfo('template_url'); ?>/images/twitter.png"/>@digicampusteam</a></li>
+						<li><a href="http://www.youtube.com/user/digitalcampusteam" rel="nofollow"  title="Our YouTube channel."><img src="<?php bloginfo('template_url'); ?>/images/youtube.png"/>YouTube</a></li>
 					</ul>
 				</div>
 				<div style="clear:both"></div>
