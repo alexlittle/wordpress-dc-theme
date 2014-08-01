@@ -1,46 +1,37 @@
-	<?php $options = get_option('optimizare_options'); ?>
-		<!--footer-->
-		<div style="clear:both;"></div>
-		<div id="footer">
-			<div id="footer-content">
-				<div class="footer-col">
-					<h4>Contact Us</h4>
-					<ul>
-						<li><a href="mailto:alex@digital-campus.org">alex@digital-campus.org</a></li>
-					</ul>
-				</div>
+			<footer role="contentinfo">
+			
+				<div id="inner-footer" class="clearfix">
+		          <hr />
+		          <div id="widget-footer" class="clearfix row">
+		            <?php if ( !function_exists('dynamic_sidebar') || !dynamic_sidebar('footer1') ) : ?>
+		            <?php endif; ?>
+		            <?php if ( !function_exists('dynamic_sidebar') || !dynamic_sidebar('footer2') ) : ?>
+		            <?php endif; ?>
+		            <?php if ( !function_exists('dynamic_sidebar') || !dynamic_sidebar('footer3') ) : ?>
+		            <?php endif; ?>
+		          </div>
+					
+					<nav class="clearfix">
+						<?php wp_bootstrap_footer_links(); // Adjust using Menus in Wordpress Admin ?>
+					</nav>
+					
+					<p class="pull-right"><a href="http://320press.com" id="credit320" title="By the dudes of 320press">320press</a></p>
+			
+					<p class="attribution">&copy; <?php bloginfo('name'); ?></p>
 				
-				<div class="footer-col">
-					<h4>About Us</h4>
-					<ul>
-						<li><a href="/team/">Team</a></li>
-						<li><a href="/team/advisory-board/">Advisory Board</a></li>
-						<li><a href="/privacy/">Privacy</a></li>
-					</ul>
-				</div>
+				</div> <!-- end #inner-footer -->
 				
-				<div class="footer-col">
-					<h4>Follow Us</h4>
-					<ul>
-						<li><a class="rss" href="<?php bloginfo('rss2_url'); ?>"><img src="<?php bloginfo('template_url'); ?>/images/feed-icon-28x28.png"/>RSS</a></li>
-						<li><a href="https://github.com/DigitalCampus/"><img src="<?php bloginfo('template_url'); ?>/images/github-icon.png"/>GitHub</a></li>
-						<li><a href="https://twitter.com/digicampusteam" rel="nofollow"  title="Follow us on twitter."><img src="<?php bloginfo('template_url'); ?>/images/twitter.png"/>@digicampusteam</a></li>
-						<li><a href="http://www.youtube.com/user/digitalcampusteam" rel="nofollow"  title="Our YouTube channel."><img src="<?php bloginfo('template_url'); ?>/images/youtube.png"/>YouTube</a></li>
-					</ul>
-				</div>
-				<div style="clear:both"></div>
-				<div id="footer-info">		
-					Digital Campus Ltd is a not-for-profit company registered in England & Wales (Company No. 7629751). &copy; <?php echo date('Y'); ?> <?php echo($options['footer_text']); ?>
-				</div>
-			</div>
-		</div>
-</div>
-<!--wrapper end-->
+			</footer> <!-- end footer -->
+		
+		</div> <!-- end #container -->
+				
+		<!--[if lt IE 7 ]>
+  			<script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+  			<script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+		<![endif]-->
+		
+		<?php wp_footer(); // js scripts are inserted using this function ?>
 
-	
-	
-	<?php wp_footer(); ?>
-	
-</body>
+	</body>
 
 </html>
