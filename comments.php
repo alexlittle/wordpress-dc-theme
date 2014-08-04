@@ -1,71 +1,64 @@
+			<div id="comments">
+<?php if ( post_password_required() ) : ?>
+				<p class="nopassword"><?php _e( 'This post is password protected. Enter the password to view any comments.', 'optimizare' ); ?></p>
+			</div><!-- #comments -->
 <?php
-/*
-The comments page for Bones
-*/
-
-// Do not delete these lines
-  if (!empty($_SERVER['SCRIPT_FILENAME']) && 'comments.php' == basename($_SERVER['SCRIPT_FILENAME']))
-    die ('Please do not load this page directly. Thanks!');
-
-  if ( post_password_required() ) { ?>
-  	<div class="alert alert-info"><?php _e("This post is password protected. Enter the password to view comments.","wpbootstrap"); ?></div>
-  <?php
-    return;
-  }
+		/* Stop the rest of comments.php from being processed,
+		 * but don't kill the script entirely -- we still have
+		 * to fully load the template.
+		 */
+		return;
+	endif;
 ?>
 
-<!-- You can start editing here. -->
+<?php
+	// You can start editing here -- including this comment!
+?>
 
 <?php if ( have_comments() ) : ?>
-	<?php if ( ! empty($comments_by_type['comment']) ) : ?>
-	<h3 id="comments"><?php comments_number('<span>' . __("No","wpbootstrap") . '</span> ' . __("Responses","wpbootstrap") . '', '<span>' . __("One","wpbootstrap") . '</span> ' . __("Response","wpbootstrap") . '', '<span>%</span> ' . __("Responses","wpbootstrap") );?> <?php _e("to","wpbootstrap"); ?> &#8220;<?php the_title(); ?>&#8221;</h3>
+			<h3 id="comments-title"><?php
+			printf( _n( 'One Response to %2$s', '%1$s Responses to %2$s', get_comments_number(), 'optimizare' ),
+			number_format_i18n( get_comments_number() ), '' . get_the_title() . '' );
+			?></h3>
 
-	<nav id="comment-nav">
-		<ul class="clearfix">
-	  		<li><?php previous_comments_link( __("Older comments","wpbootstrap") ) ?></li>
-	  		<li><?php next_comments_link( __("Newer comments","wpbootstrap") ) ?></li>
-	 	</ul>
-	</nav>
-	
-	<ol class="commentlist">
-		<?php wp_list_comments('type=comment&callback=wp_bootstrap_comments'); ?>
-	</ol>
-	
-	<?php endif; ?>
-	
-	<?php if ( ! empty($comments_by_type['pings']) ) : ?>
-		<h3 id="pings">Trackbacks/Pingbacks</h3>
-		
-		<ol class="pinglist">
-			<?php wp_list_comments('type=pings&callback=list_pings'); ?>
-		</ol>
-	<?php endif; ?>
-	
-	<nav id="comment-nav">
-		<ul class="clearfix">
-	  		<li><?php previous_comments_link( __("Older comments","wpbootstrap") ) ?></li>
-	  		<li><?php next_comments_link( __("Newer comments","wpbootstrap") ) ?></li>
-		</ul>
-	</nav>
-  
-	<?php else : // this is displayed if there are no comments so far ?>
+<?php if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // Are there comments to navigate through? ?>
+			<div class="navigation">
+				<div class="nav-previous"><?php previous_comments_link( __( '<span class="meta-nav">&larr;</span> Older Comments', 'optimizare' ) ); ?></div>
+				<div class="nav-next"><?php next_comments_link( __( 'Newer Comments <span class="meta-nav">&rarr;</span>', 'optimizare' ) ); ?></div>
+			</div> <!-- .navigation -->
+<?php endif; // check for comment navigation ?>
 
-	<?php if ( comments_open() ) : ?>
-    	<!-- If comments are open, but there are no comments. -->
+			<ol class="commentlist">
+				<?php
+					/* Loop through and list the comments. Tell wp_list_comments()
+					 * to use optimizare_comment() to format the comments.
+					 * If you want to overload this in a child theme then you can
+					 * define optimizare_comment() and that will be used instead.
+					 * See optimizare_comment() in optimizare/functions.php for more.
+					 */
+					wp_list_comments( array( 'callback' => 'optimizare_comment' ) );
+				?>
+			</ol>
 
-	<?php else : // comments are closed 
-	?>
-		
-	<!-- If comments are closed.
-	<p class="alert alert-info"><?php _e("Comments are closed","wpbootstrap"); ?>.</p> -->
-				
-	<?php endif; ?>
+<?php if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // Are there comments to navigate through? ?>
+			<div class="navigation">
+				<div class="nav-previous"><?php previous_comments_link( __( '<span class="meta-nav">&larr;</span> Older Comments', 'optimizare' ) ); ?></div>
+				<div class="nav-next"><?php next_comments_link( __( 'Newer Comments <span class="meta-nav">&rarr;</span>', 'optimizare' ) ); ?></div>
+			</div><!-- .navigation -->
+<?php endif; // check for comment navigation ?>
 
-<?php endif; ?>
+<?php else : // or, if we don't have comments:
 
+	/* If there are no comments and comments are closed,
+	 * let's leave a little note, shall we?
+	 */
+	if ( ! comments_open() ) :
+?>
+	<p class="nocomments"><?php _e( 'Comments are closed.', 'optimizare' ); ?></p>
+<?php endif; // end ! comments_open() ?>
 
-<?php if ( comments_open() ) : ?>
+<?php endif; // end have_comments() ?>
 
-	<?php comment_form(); ?>
+<?php comment_form(); ?>
 
-<?php endif; // if you delete this the sky will fall on your head ?>
+</div><!-- #comments -->

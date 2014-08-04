@@ -1,70 +1,109 @@
-<!doctype html>  
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" <?php language_attributes(); ?>>
 
-<!--[if IEMobile 7 ]> <html <?php language_attributes(); ?>class="no-js iem7"> <![endif]-->
-<!--[if lt IE 7 ]> <html <?php language_attributes(); ?> class="no-js ie6"> <![endif]-->
-<!--[if IE 7 ]>    <html <?php language_attributes(); ?> class="no-js ie7"> <![endif]-->
-<!--[if IE 8 ]>    <html <?php language_attributes(); ?> class="no-js ie8"> <![endif]-->
-<!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html <?php language_attributes(); ?> class="no-js"><!--<![endif]-->
+
+	<head profile="http://gmpg.org/xfn/11">
+		<meta http-equiv="Content-Type" content="<?php bloginfo('html_type'); ?>; charset=<?php bloginfo('charset'); ?>" />
+		<title><?php if (is_front_page() ) {
+    bloginfo('name');
+	} elseif ( is_category() ) {
+		single_cat_title(); echo ' - ' ; bloginfo('name');
+	} elseif (is_single() ) {
+		single_post_title();
+	} elseif (is_page() ) {
+		single_post_title(); echo ' - '; bloginfo('name');
+	} elseif (is_archive() ) {
+		single_month_title(); echo ' - '; bloginfo('name');
+	} else {
+		wp_title('',true);
+	} ?></title>
+		
+<link rel="shortcut icon" href="<?php bloginfo('template_url'); ?>/images/favicon.ico"/>		
+<link rel="stylesheet" type="text/css" media="all" href="<?php bloginfo('template_url'); ?>/style.css" />
+
+<!--[if IE 6]>
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri(); ?>/css/ie6.css" />
+<![endif]-->
+
+<!--[if IE 7]>
+	<link rel="stylesheet" type="text/css" href="<?php echo get_template_directory_uri(); ?>/css/ie7.css" />
+<![endif]-->
+
+<?php
+
+	if ( is_singular() && get_option( 'thread_comments' ) )
+		wp_enqueue_script( 'comment-reply' );
+
+	wp_enqueue_script('jquery');
 	
-	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-		<title><?php wp_title( '|', true, 'right' ); ?></title>	
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  		<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
+	wp_head();
+?>
 
-		<!-- wordpress head functions -->
-		<?php wp_head(); ?>
-		<!-- end of wordpress head -->
-		<!-- IE8 fallback moved below head to work properly. Added respond as well. Tested to work. -->
-			<!-- media-queries.js (fallback) -->
-		<!--[if lt IE 9]>
-			<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>			
-		<![endif]-->
+<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
 
-		<!-- html5.js -->
-		<!--[if lt IE 9]>
-			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->	
-		
-			<!-- respond.js -->
-		<!--[if lt IE 9]>
-		          <script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
-		<![endif]-->	
-	</head>
+<script type="text/javascript"> 
+
+    jQuery(document).ready(function() { 
+        jQuery('input[id="s"]').focus(function() {  
+               jQuery("#search").addClass('focus');
+        });
+        
+        jQuery('input[id="s"]').blur(function() {  
+               jQuery("#search").removeClass('focus');
+        });
+
+
+        jQuery('#gallery div.active').fadeIn(1000);
+        setInterval( 'slideSwitch()', 8000 );
+    });
+
+    function slideSwitch() {
+    	var $active = jQuery('#gallery div.active');
+    	var $next = $active.next().length ? $active.next() : jQuery('#gallery div:first');
+    	$active.fadeOut(4000, function() {$active.removeClass('active')});
+    	$next.fadeIn(4000, function() {$next.addClass('active')});
+   	}
+ 
+</script>
+<?php 
+    $options = get_option('optimizare_options'); 
+    echo($options['analytics_code']); 
+?>
+
+</head>
+
+<body <?php body_class(); ?>>
+
+	<!--wrapper-->
+	<div id="wrapper">
 	
-	<body <?php body_class(); ?>>
-				
-		<header role="banner">
-				
-			<div class="navbar navbar-default navbar-fixed-top">
-				<div class="container">
-          
-					<div class="navbar-header">
-						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
-
-						<a class="navbar-brand" title="<?php echo get_bloginfo('description'); ?>" href="<?php echo home_url(); ?>">
-							<?php bloginfo('name'); ?>
-						</a>
-					</div>
-
-					<div class="collapse navbar-collapse navbar-responsive-collapse">
-						<?php wp_bootstrap_main_nav(); // Adjust using Menus in Wordpress Admin ?>
-
-						<form class="navbar-form navbar-right" role="search" method="get" id="searchform" action="<?php echo home_url( '/' ); ?>">
-							<div class="form-group">
-								<input name="s" id="s" type="text" class="search-query form-control" autocomplete="off" placeholder="<?php _e('Search','wpbootstrap'); ?>" data-provide="typeahead" data-items="4" data-source='<?php echo $typeahead_data; ?>'>
-							</div>
-						</form>
-					</div>
-
-				</div> <!-- end .container -->
-			</div> <!-- end .navbar -->
+		<!--header-->
+		<div id="header">
 		
-		</header> <!-- end header -->
+			<div id="logo">
+
+				<a href="<?php echo home_url(); ?>" title="<?php bloginfo('description'); ?>">
+				<img src="<?php bloginfo('template_url'); ?>/images/dc-logo.png" alt="<?php bloginfo('title'); ?> - <?php bloginfo('description'); ?>" title="<?php bloginfo('title'); ?> - <?php bloginfo('description'); ?>"/>
+				</a>
+				
+			</div><!--logo end-->
+			
+			
+			</div><!-- header end-->
 		
-		<div class="container">
+		<!--menu-->
+			
+            <div id="menubar">
+				<?php
+					wp_nav_menu(array('container' => 'div',
+									  'container_class' => 'menu',
+									  'menu_class' => 'nav',
+									  'fallback_cb' => 'optimizare_page_menu'
+									  ));
+				?>
+		<div class="clear"></div>	
+            </div>
+	
+		<div class="clear"></div>
+  
+		<!--menu end-->

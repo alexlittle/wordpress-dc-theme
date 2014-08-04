@@ -1,19 +1,30 @@
-				<div id="sidebar1" class="col-sm-4" role="complementary">
+		<!--right-col-->
+		<div id="right-col">
+			
+				<!--sidebar-->
+				<div id="sidebar">
+			
+			<ul>
+
+<?php
+
+	if ( ! dynamic_sidebar( 'primary-widget-area' ) ) : ?>
+
+
+		<?php endif; // end primary widget area ?>
+			</ul>
+
+<?php
+	// A second sidebar for widgets, just because.
+	if ( is_active_sidebar( 'secondary-widget-area' ) ) : ?>
+
+			<ul>
+				<?php dynamic_sidebar( 'secondary-widget-area' ); ?>
+			</ul>
+			
+
+<?php endif; ?>
+
+				</div><!--sb end-->
 				
-					<?php if ( is_active_sidebar( 'sidebar1' ) ) : ?>
-
-						<?php dynamic_sidebar( 'sidebar1' ); ?>
-
-					<?php else : ?>
-
-						<!-- This content shows up if there are no widgets defined in the backend. -->
-						
-						<div class="alert alert-message">
-						
-							<p><?php _e("Please activate some Widgets","wpbootstrap"); ?>.</p>
-						
-						</div>
-
-					<?php endif; ?>
-
-				</div>
+			</div> <!--right-col-->
