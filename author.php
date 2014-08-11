@@ -1,86 +1,61 @@
-<?php get_header(); ?>
-			
-			<div id="content" class="clearfix row">
-			
-				<div id="main" class="col-sm-8 clearfix" role="main">
-				
-					<div class="page-header"><h1 class="archive_title h2">
-						<span><?php _e("Posts By:", "wpbootstrap"); ?></span> 
-						<?php 
-							// If google profile field is filled out on author profile, link the author's page to their google+ profile page
-							$curauth = (get_query_var('author_name')) ? get_user_by('slug', get_query_var('author_name')) : get_userdata(get_query_var('author'));
-							$google_profile = get_the_author_meta( 'google_profile', $curauth->ID );
-							if ( $google_profile ) {
-								echo '<a href="' . esc_url( $google_profile ) . '" rel="me">' . $curauth->display_name . '</a>'; 
-						?>
-						<?php 
-							} else {
-								echo get_the_author_meta('display_name', $curauth->ID);
-							}
-						?>
-					</h1></div>
-					
-					<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-					
-					<article id="post-<?php the_ID(); ?>" <?php post_class('clearfix'); ?> role="article">
-						
-						<header>
-							
-							<h3 class="h2"><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h3>
-							
-						</header> <!-- end article header -->
-					
-						<section class="post_content">
-						
-							<?php the_post_thumbnail( 'wpbs-featured' ); ?>
-						
-							<?php the_excerpt(); ?>
-					
-						</section> <!-- end article section -->
-						
-						<footer>
-							
-							<p class="meta"><?php _e("Posted", "wpbootstrap"); ?> <time datetime="<?php echo the_time('Y-m-j'); ?>" pubdate><?php the_time(); ?> <?php echo the_time('j M Y'); ?></time> <?php _e("by", "wpbootstrap"); ?> <?php the_author_posts_link(); ?> <span class="amp">&</span> <?php _e("filed under", "wpbootstrap"); ?> <?php the_category(', '); ?>.</p>
-						
-						</footer> <!-- end article footer -->
-					
-					</article> <!-- end article -->
-					
-					<?php endwhile; ?>	
-					
-					<?php if (function_exists('page_navi')) { // if expirimental feature is active ?>
-						
-						<?php page_navi(); // use the page navi function ?>
+<?php
+/** author.php
+ *
+ * The template for displaying Author Archive pages.
+ *
+ * @author		Konstantin Obenland
+ * @package		The Bootstrap
+ * @since		1.0.0 - 07.02.2012
+ */
 
-					<?php } else { // if it is disabled, display regular wp prev & next links ?>
-						<nav class="wp-prev-next">
-							<ul class="clearfix">
-								<li class="prev-link"><?php next_posts_link(_e('&laquo; Older Entries', "wpbootstrap")) ?></li>
-								<li class="next-link"><?php previous_posts_link(_e('Newer Entries &raquo;', "wpbootstrap")) ?></li>
-							</ul>
-						</nav>
-					<?php } ?>
-								
-					
-					<?php else : ?>
-					
-					<article id="post-not-found">
-					    <header>
-					    	<h1><?php _e("No Posts Yet", "wpbootstrap"); ?></h1>
-					    </header>
-					    <section class="post_content">
-					    	<p><?php _e("Sorry, What you were looking for is not here.", "wpbootstrap"); ?></p>
-					    </section>
-					    <footer>
-					    </footer>
-					</article>
-					
-					<?php endif; ?>
-			
-				</div> <!-- end #main -->
-    
-				<?php get_sidebar(); // sidebar 1 ?>
-    
-			</div> <!-- end #content -->
+get_header(); ?>
 
-<?php get_footer(); ?>
+<section id="primary" class="span8">
+
+	<?php tha_content_before(); ?>
+	<div id="content" role="main">
+		<?php tha_content_top();
+		
+		if ( have_posts() ) :
+			the_post(); ?>
+
+			<header class="page-header">
+				<h1 class="page-title author"><?php printf( __( 'Author Archives: %s', 'the-bootstrap' ), '<span class="vcard"><a class="url fn n" href="' . esc_url( get_author_posts_url( get_the_author_meta( "ID" ) ) ) . '" title="' . esc_attr( get_the_author() ) . '" rel="me">' . get_the_author() . '</a></span>' ); ?></h1>
+			</header><!-- .page-header -->
+	
+			<?php
+			rewind_posts();
+			// If a user has filled out their description, show a bio on their entries.
+			if ( get_the_author_meta( 'description' ) ) : ?>
+			<div id="author-info" class="row">
+				<h2 class="span8"><?php printf( __( 'About %s', 'the-bootstrap' ), get_the_author() ); ?></h2>
+				<div id="author-avatar" class="span1">
+					<?php echo get_avatar( get_the_author_meta( 'user_email' ), apply_filters( 'the-bootstrap_author_bio_avatar_size', 70 ) ); ?>
+				</div><!-- #author-avatar -->
+				<div id="author-description" class="span7">
+					<?php the_author_meta( 'description' ); ?>
+				</div><!-- #author-description	-->
+			</div><!-- #author-info -->
+			<?php endif;
+			
+			while ( have_posts() ) {
+				the_post();
+				get_template_part( '/partials/content', get_post_format() );
+			}
+			the_bootstrap_content_nav();
+		else :
+			get_template_part( '/partials/content', 'not-found' );
+		endif;
+		
+		tha_content_bottom(); ?>
+	</div><!-- #content -->
+	<?php tha_content_after(); ?>
+</section><!-- #primary -->
+
+<?php
+get_sidebar();
+get_footer();
+
+
+/* End of file author.php */
+/* Location: ./wp-content/themes/the-bootstrap/author.php */

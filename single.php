@@ -1,68 +1,42 @@
-<?php get_header(); ?>
-			
-			<div id="content" class="clearfix row">
-			
-				<div id="main" class="col-sm-8 clearfix" role="main">
+<?php
+/** single.php
+ *
+ * The Template for displaying all single posts.
+ *
+ * @author		Konstantin Obenland
+ * @package		The Bootstrap
+ * @since		1.0.0 - 05.02.2012
+ */
 
-					<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-					
-					<article id="post-<?php the_ID(); ?>" <?php post_class('clearfix'); ?> role="article" itemscope itemtype="http://schema.org/BlogPosting">
-						
-						<header>
-						
-							<!--  ?php the_post_thumbnail( 'wpbs-featured' ); ?-->
-							
-							<div class="page-header"><h1 class="single-title" itemprop="headline"><?php the_title(); ?></h1></div>
-							
-						</header> <!-- end article header -->
-					
-						<section class="post_content clearfix" itemprop="articleBody">
-							<?php the_content(); ?>
-							
-							<?php wp_link_pages(); ?>
-					
-						</section> <!-- end article section -->
-						
-						<footer>
-			
-							<p class="meta"><?php _e("Posted", "wpbootstrap"); ?> <time datetime="<?php echo the_time('Y-m-j'); ?>" pubdate><?php the_time(); ?> <?php echo the_time('j M Y'); ?></time> <?php _e("by", "wpbootstrap"); ?> <?php the_author_posts_link(); ?> <span class="amp">&</span> <?php _e("filed under", "wpbootstrap"); ?> <?php the_category(', '); ?>.</p>
-						
-							<?php the_tags('<p class="tags"><span class="tags-title">' . __("Tags","wpbootstrap") . ':</span> ', ' ', '</p>'); ?>
-							
-							<?php 
-							// only show edit button if user has permission to edit posts
-							if( $user_level > 0 ) { 
-							?>
-							<a href="<?php echo get_edit_post_link(); ?>" class="btn btn-success edit-post"><i class="icon-pencil icon-white"></i> <?php _e("Edit post","wpbootstrap"); ?></a>
-							<?php } ?>
-							
-						</footer> <!-- end article footer -->
-					
-					</article> <!-- end article -->
-					
-					<?php comments_template('',true); ?>
-					
-					<?php endwhile; ?>			
-					
-					<?php else : ?>
-					
-					<article id="post-not-found">
-					    <header>
-					    	<h1><?php _e("Not Found", "wpbootstrap"); ?></h1>
-					    </header>
-					    <section class="post_content">
-					    	<p><?php _e("Sorry, but the requested resource was not found on this site.", "wpbootstrap"); ?></p>
-					    </section>
-					    <footer>
-					    </footer>
-					</article>
-					
-					<?php endif; ?>
-			
-				</div> <!-- end #main -->
-    
-				<?php get_sidebar(); // sidebar 1 ?>
-    
-			</div> <!-- end #content -->
+get_header(); ?>
 
-<?php get_footer(); ?>
+<section id="primary" class="span8">
+	
+	<?php tha_content_before(); ?>
+	<div id="content" role="main">
+		<?php tha_content_top();
+
+		while ( have_posts() ) {
+			the_post();
+			get_template_part( '/partials/content', 'single' );
+			comments_template();
+		} ?>
+		
+		<nav id="nav-single" class="pager">
+			<h3 class="assistive-text"><?php _e( 'Post navigation', 'the-bootstrap' ); ?></h3>
+			<span class="next"><?php next_post_link( '%link', sprintf( '%1$s <span class="meta-nav">&rarr;</span>', __( 'Next Post', 'the-bootstrap' ) ) ); ?></span>
+			<span class="previous"><?php previous_post_link( '%link', sprintf( '<span class="meta-nav">&larr;</span> %1$s', __( 'Previous Post', 'the-bootstrap' ) ) ); ?></span>
+		</nav><!-- #nav-single -->
+		
+		<?php tha_content_bottom(); ?>
+	</div><!-- #content -->
+	<?php tha_content_after(); ?>
+</section><!-- #primary -->
+
+<?php
+get_sidebar();
+get_footer();
+
+
+/* End of file index.php */
+/* Location: ./wp-content/themes/the-bootstrap/single.php */

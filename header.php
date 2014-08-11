@@ -1,70 +1,94 @@
-<!doctype html>  
+<?php
+/** header.php
+ *
+ * Displays all of the <head> section and everything up till </header>
+ *
+ * @author		Konstantin Obenland
+ * @package		The Bootstrap
+ * @since		1.0 - 05.02.2012
+ */
 
-<!--[if IEMobile 7 ]> <html <?php language_attributes(); ?>class="no-js iem7"> <![endif]-->
-<!--[if lt IE 7 ]> <html <?php language_attributes(); ?> class="no-js ie6"> <![endif]-->
-<!--[if IE 7 ]>    <html <?php language_attributes(); ?> class="no-js ie7"> <![endif]-->
-<!--[if IE 8 ]>    <html <?php language_attributes(); ?> class="no-js ie8"> <![endif]-->
-<!--[if (gte IE 9)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html <?php language_attributes(); ?> class="no-js"><!--<![endif]-->
-	
+?>
+<!DOCTYPE html>
+<html class="no-js" <?php language_attributes(); ?>>
 	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-		<title><?php wp_title( '|', true, 'right' ); ?></title>	
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  		<link rel="pingback" href="<?php bloginfo('pingback_url'); ?>">
-
-		<!-- wordpress head functions -->
-		<?php wp_head(); ?>
-		<!-- end of wordpress head -->
-		<!-- IE8 fallback moved below head to work properly. Added respond as well. Tested to work. -->
-			<!-- media-queries.js (fallback) -->
-		<!--[if lt IE 9]>
-			<script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script>			
-		<![endif]-->
-
-		<!-- html5.js -->
-		<!--[if lt IE 9]>
-			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->	
+		<?php tha_head_top(); ?>
+		<link rel="profile" href="http://gmpg.org/xfn/11" />
+		<meta charset="<?php bloginfo( 'charset' ); ?>" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		
-			<!-- respond.js -->
-		<!--[if lt IE 9]>
-		          <script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
-		<![endif]-->	
+		<title><?php wp_title( '&laquo;', true, 'right' ); ?></title>
+		
+		<?php tha_head_bottom(); ?>
+		<?php wp_head(); ?>
 	</head>
 	
 	<body <?php body_class(); ?>>
-				
-		<header role="banner">
-				
-			<div class="navbar navbar-default navbar-fixed-top">
-				<div class="container">
-          
-					<div class="navbar-header">
-						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
-
-						<a class="navbar-brand" title="<?php echo get_bloginfo('description'); ?>" href="<?php echo home_url(); ?>">
-							<?php bloginfo('name'); ?>
-						</a>
-					</div>
-
-					<div class="collapse navbar-collapse navbar-responsive-collapse">
-						<?php wp_bootstrap_main_nav(); // Adjust using Menus in Wordpress Admin ?>
-
-						<form class="navbar-form navbar-right" role="search" method="get" id="searchform" action="<?php echo home_url( '/' ); ?>">
-							<div class="form-group">
-								<input name="s" id="s" type="text" class="search-query form-control" autocomplete="off" placeholder="<?php _e('Search','wpbootstrap'); ?>" data-provide="typeahead" data-items="4" data-source='<?php echo $typeahead_data; ?>'>
-							</div>
-						</form>
-					</div>
-
-				</div> <!-- end .container -->
-			</div> <!-- end .navbar -->
-		
-		</header> <!-- end header -->
-		
 		<div class="container">
+			<div id="page" class="hfeed row">
+				<?php tha_header_before(); ?>
+				<header id="branding" role="banner" class="span12">
+					<?php tha_header_top();
+					wp_nav_menu( array(
+						'container'			=>	'nav',
+						'container_class'	=>	'subnav clearfix',
+						'theme_location'	=>	'header-menu',
+						'menu_class'		=>	'nav nav-pills pull-right',
+						'depth'				=>	3,
+						'fallback_cb'		=>	false,
+						'walker'			=>	new The_Bootstrap_Nav_Walker,
+					) ); ?>
+					
+					<?php if ( get_header_image() ) : ?>
+					<a id="header-image" href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
+						<img src="<?php header_image(); ?>" width="<?php echo get_custom_header()->width; ?>" height="<?php echo get_custom_header()->height; ?>" alt="" />
+					</a>
+					<?php endif; // if ( get_header_image() ) ?>
+
+					<nav id="access" role="navigation">
+						<h3 class="assistive-text"><?php _e( 'Main menu', 'the-bootstrap' ); ?></h3>
+						<div class="skip-link"><a class="assistive-text" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
+						<div class="skip-link"><a class="assistive-text" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
+						<?php if ( has_nav_menu( 'primary' ) OR the_bootstrap_options()->navbar_site_name OR the_bootstrap_options()->navbar_searchform ) : ?>
+						<div <?php the_bootstrap_navbar_class(); ?>>
+							<div class="navbar-inner">
+								<div class="container">
+									<!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+									<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+										<span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+										<span class="icon-bar"></span>
+									</a>
+									<?php if ( the_bootstrap_options()->navbar_site_name ) : ?>
+									<a class="brand" href="<?php echo home_url(); ?>">
+										<img src=""/>
+										<?php bloginfo( 'name' ); ?>
+									</a>
+									<?php endif;?>
+									<div class="nav-collapse">
+										<?php wp_nav_menu( array(
+											'theme_location'	=>	'primary',
+											'menu_class'		=>	'nav',
+											'depth'				=>	3,
+											'fallback_cb'		=>	false,
+											'walker'			=>	new The_Bootstrap_Nav_Walker,
+										) ); 
+										if ( the_bootstrap_options()->navbar_searchform ) {
+											the_bootstrap_navbar_searchform();
+										} ?>
+								    </div>
+								</div>
+							</div>
+						</div>
+						<?php endif; ?>
+					</nav><!-- #access -->
+					<?php if ( function_exists( 'yoast_breadcrumb' ) ) {
+						yoast_breadcrumb( '<nav id="breadcrumb" class="breadcrumb">', '</nav>' );
+					}
+					tha_header_bottom(); ?>
+				</header><!-- #branding --><?php
+				tha_header_after();
+				
+
+/* End of file header.php */
+/* Location: ./wp-content/themes/the-bootstrap/header.php */

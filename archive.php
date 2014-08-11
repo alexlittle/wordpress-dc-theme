@@ -1,97 +1,62 @@
-<?php get_header(); ?>
-			
-			<div id="content" class="clearfix row">
-			
-				<div id="main" class="col-sm-8 clearfix" role="main">
-				
-					<div class="page-header">
-					<?php if (is_category()) { ?>
-						<h1 class="archive_title h2">
-							<span><?php _e("Posts Categorized:", "wpbootstrap"); ?></span> <?php single_cat_title(); ?>
-						</h1>
-					<?php } elseif (is_tag()) { ?> 
-						<h1 class="archive_title h2">
-							<span><?php _e("Posts Tagged:", "wpbootstrap"); ?></span> <?php single_tag_title(); ?>
-						</h1>
-					<?php } elseif (is_author()) { ?>
-						<h1 class="archive_title h2">
-							<span><?php _e("Posts By:", "wpbootstrap"); ?></span> <?php get_the_author_meta('display_name'); ?>
-						</h1>
-					<?php } elseif (is_day()) { ?>
-						<h1 class="archive_title h2">
-							<span><?php _e("Daily Archives:", "wpbootstrap"); ?></span> <?php the_time('l, F j, Y'); ?>
-						</h1>
-					<?php } elseif (is_month()) { ?>
-					    <h1 class="archive_title h2">
-					    	<span><?php _e("Monthly Archives:", "wpbootstrap"); ?>:</span> <?php the_time('F Y'); ?>
-					    </h1>
-					<?php } elseif (is_year()) { ?>
-					    <h1 class="archive_title h2">
-					    	<span><?php _e("Yearly Archives:", "wpbootstrap"); ?>:</span> <?php the_time('Y'); ?>
-					    </h1>
-					<?php } ?>
-					</div>
+<?php
+/** archive.php
+ *
+ * The template for displaying Archive pages.
+ *
+ * Used to display archive-type pages if nothing more specific matches a query.
+ * For example, puts together date-based pages if no date.php file exists.
+ *
+ * Learn more: http://codex.wordpress.org/Template_Hierarchy
+ *
+ * @author		Konstantin Obenland
+ * @package		The Bootstrap
+ * @since		1.0.0 - 07.02.2012
+ */
 
-					<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-					
-					<article id="post-<?php the_ID(); ?>" <?php post_class('clearfix'); ?> role="article">
-						
-						<header>
-							
-							<h3 class="h2"><a href="<?php the_permalink() ?>" rel="bookmark" title="<?php the_title_attribute(); ?>"><?php the_title(); ?></a></h3>
-							
-						</header> <!-- end article header -->
-					
-						<section class="post_content">
-						
-							<?php the_post_thumbnail( 'wpbs-featured' ); ?>
-						
-							<?php the_excerpt(); ?>
-					
-						</section> <!-- end article section -->
-						
-						<footer>
-							<p class="meta"><?php _e("Posted", "wpbootstrap"); ?> <time datetime="<?php echo the_time('Y-m-j'); ?>" pubdate><?php echo the_time('Y-m-j'); ?><?php the_time(); ?> <?php echo the_time('j M Y'); ?></time> <?php _e("by", "wpbootstrap"); ?> <?php the_author_posts_link(); ?> <span class="amp">&</span> <?php _e("filed under", "wpbootstrap"); ?> <?php the_category(', '); ?>.</p>
-						
-						</footer> <!-- end article footer -->
-					
-					</article> <!-- end article -->
-					
-					<?php endwhile; ?>	
-					
-					<?php if (function_exists('page_navi')) { // if expirimental feature is active ?>
-						
-						<?php page_navi(); // use the page navi function ?>
+get_header(); ?>
 
-					<?php } else { // if it is disabled, display regular wp prev & next links ?>
-						<nav class="wp-prev-next">
-							<ul class="pager">
-								<li class="previous"><?php next_posts_link(_e('&laquo; Older Entries', "wpbootstrap")) ?></li>
-								<li class="next"><?php previous_posts_link(_e('Newer Entries &raquo;', "wpbootstrap")) ?></li>
-							</ul>
-						</nav>
-					<?php } ?>
-								
-					
-					<?php else : ?>
-					
-					<article id="post-not-found">
-					    <header>
-					    	<h1><?php _e("No Posts Yet", "wpbootstrap"); ?></h1>
-					    </header>
-					    <section class="post_content">
-					    	<p><?php _e("Sorry, What you were looking for is not here.", "wpbootstrap"); ?></p>
-					    </section>
-					    <footer>
-					    </footer>
-					</article>
-					
-					<?php endif; ?>
-			
-				</div> <!-- end #main -->
-    
-				<?php get_sidebar(); // sidebar 1 ?>
-    
-			</div> <!-- end #content -->
+<section id="primary" class="span8">
 
-<?php get_footer(); ?>
+	<?php tha_content_before(); ?>
+	<div id="content" role="main">
+		<?php tha_content_top();
+		
+		if ( have_posts() ) : ?>
+
+			<header class="page-header">
+				<h1 class="page-title">
+					<?php
+					if ( is_day() ) :
+						printf( __( 'Daily Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date() . '</span>' );
+					elseif ( is_month() ) :
+						printf( __( 'Monthly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'F Y' ) . '</span>' );
+					elseif ( is_year() ) :
+						printf( __( 'Yearly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'Y' ) . '</span>' );
+					else :
+						_e( 'Blog Archives', 'the-bootstrap' );
+					endif; ?>
+				</h1>
+			</header><!-- .page-header -->
+
+			<?php
+			while ( have_posts() ) {
+				the_post();
+				get_template_part( '/partials/content', get_post_format() );
+			}
+			the_bootstrap_content_nav();
+		else :
+			get_template_part( '/partials/content', 'not-found' );
+		endif;
+		
+		tha_content_bottom(); ?>
+	</div><!-- #content -->
+	<?php tha_content_after(); ?>
+</section><!-- #primary -->
+
+<?php
+get_sidebar();
+get_footer();
+
+
+/* End of file archive.php */
+/* Location: ./wp-content/themes/the-bootstrap/archive.php */

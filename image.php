@@ -1,143 +1,114 @@
 <?php
-/**
- * The WordPress template hierarchy first checks for any
- * MIME-types and then looks for the attachment.php file.
+/** image.php
  *
- * @link codex.wordpress.org/Template_Hierarchy#Attachment_display 
- */ 
+ * The template for displaying image attachments.
+ *
+ * @author		Konstantin Obenland
+ * @package		The Bootstrap
+ * @since		1.0.0 - 05.02.2012
+ */
 
-get_header(); ?>
-			
-			<div id="content" class="clearfix row">
-			
-				<div id="main" class="col-sm-8 clearfix" role="main">
+get_header();
 
-					<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-					
-					<article id="post-<?php the_ID(); ?>" <?php post_class('clearfix'); ?> role="article" itemscope itemtype="http://schema.org/BlogPosting">
-						
-						<header> 
-							
-							<div class="page-header"><h1 class="single-title" itemprop="headline"><a href="<?php echo get_permalink($post->post_parent); ?>" rev="attachment"><?php echo get_the_title($post->post_parent); ?></a> &raquo; <?php the_title(); ?></h1></div>
-							
-						</header> <!-- end article header -->
-					
-						<section class="post_content clearfix" itemprop="articleBody">
-							
-							<!-- To display current image in the photo gallery -->
-							<div class="attachment-img">
-							      <a href="<?php echo wp_get_attachment_url($post->ID); ?>">
-							      							      
-							      <?php 
-							      	$image = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'large' ); 
-							       
-								      if ($image) : ?>
-								          <img src="<?php echo $image[0]; ?>" alt="" />
-								      <?php endif; ?>
-							      
-							      </a>
-							</div>
-							
-							<!-- To display thumbnail of previous and next image in the photo gallery -->
-							<ul id="gallery-nav" class="clearfix">
-								<li class="next pull-left"><?php next_image_link() ?></li>
-								<li class="previous pull-right"><?php previous_image_link() ?></li>
-							</ul>
-							
-						</section> <!-- end article section -->
-						
-						<footer>
-							
-							<p class="meta"><?php _e("Posted", "wpbootstrap"); ?> <time datetime="<?php echo the_time('Y-m-j'); ?>" pubdate><?php the_time(); ?> <?php echo the_time('j M Y'); ?></time> <?php _e("by", "wpbootstrap"); ?> <?php the_author_posts_link(); ?>.</p>
-						
-							<?php the_tags('<p class="tags"><span class="tags-title">' . __("Tags","wpbootstrap") . ':</span> ', ' ', '</p>'); ?>
-							
-						</footer> <!-- end article footer -->
-					
-					</article> <!-- end article -->
-					
-					<?php comments_template(); ?>
-					
-					<?php endwhile; ?>			
-					
-					<?php else : ?>
-					
-					<article id="post-not-found">
-					    <header>
-					    	<h1><?php _e("Not Found", "wpbootstrap"); ?></h1>
-					    </header>
-					    <section class="post_content">
-					    	<p><?php _e("Sorry, but the requested resource was not found on this site.", "wpbootstrap"); ?></p>
-					    </section>
-					    <footer>
-					    </footer>
-					</article>
-					
-					<?php endif; ?>
-			
-				</div> <!-- end #main -->
-				
-				<div id="sidebar1" class="col col-lg-4 fluid-sidebar sidebar" role="complementary">
-				
-					<?php if ( !empty($post->post_excerpt) ) { ?> 
-					<p class="alert alert-block success"><?php echo get_the_excerpt(); ?></p>
-					<?php } ?>
-								
-					<!-- Using WordPress functions to retrieve the extracted EXIF information from database -->
-					<div class="well">
-					
-						<h3><?php _e("Image metadata","wpbootstrap"); ?></h3>
-					
-					   <?php
-					      $imgmeta = wp_get_attachment_metadata( $id );
-					
-					// Convert the shutter speed retrieve from database to fraction
-							if (($imgmeta['shutter_speed']) != 0) {
-								if ((1 / $imgmeta['image_meta']['shutter_speed']) > 1)
-								{
-									if ((number_format((1 / $imgmeta['image_meta']['shutter_speed']), 1)) == 1.3
-									or number_format((1 / $imgmeta['image_meta']['shutter_speed']), 1) == 1.5
-									or number_format((1 / $imgmeta['image_meta']['shutter_speed']), 1) == 1.6
-									or number_format((1 / $imgmeta['image_meta']['shutter_speed']), 1) == 2.5)
-									{
-										$pshutter = "1/" . number_format((1 / $imgmeta['image_meta']['shutter_speed']), 1, '.', '') . " second";
-									} else {
-										$pshutter = "1/" . number_format((1 / $imgmeta['image_meta']['shutter_speed']), 0, '.', '') . " second";
-									}
-									} else {
-										$pshutter = $imgmeta['image_meta']['shutter_speed'] . " seconds";
-									}
-								}
-							else {
-								echo("Shutter Speed Unavailable");
+$attachments = array_values( get_children( array(
+	'post_parent'		=>	$post->post_parent,
+	'post_status'		=>	'inherit',
+	'post_type'			=>	'attachment',
+	'post_mime_type'	=>	'image',
+	'order'				=>	'ASC',
+	'orderby'			=>	'menu_order ID'
+)));
+
+$total_images = count( $attachments );
+
+//Get position of current pic
+foreach ( $attachments as $k => $attachment ) {
+	if ( $attachment->ID == $post->ID )
+		break;
+}
+
+the_post();
+?>
+
+<section id="primary" class="image-attachment span12">
+
+	<?php tha_content_before(); ?>
+	<div id="content" role="main">
+		<?php tha_content_top(); ?>
+
+		<nav id="nav-single" class="well clearfix">
+			<span class="gallery-link pull-left">
+				<a href="<?php echo get_permalink( $post->post_parent ); ?>">
+				<?php printf(
+					_x( '&laquo; %1$s (%2$s)', 'Post title, amount of images', 'the-bootstrap' ),
+					get_the_title( $post->post_parent ),
+					sprintf(
+						_nx( '%d image', '%d images', $total_images, 'Amount of images', 'the-bootstrap' ),
+						$total_images
+					)
+				); ?>
+				</a>
+			</span>
+			<span class="nav-links pull-right">
+				<?php
+				edit_post_link( __( 'Edit', 'the-bootstrap' ), ' <span class="edit-link label">', '</span><span class="sep">&nbsp;</span>' );
+				the_bootstrap_comments_link( __( 'Leave a comment', 'the-bootstrap' ) );
+				if ( isset($attachments[$k-1]) )
+					echo ' &mdash; <a href="' . get_permalink( $attachments[$k-1]->ID ) . '">' . __( '&laquo; Previous Photo', 'the-bootstrap' ) . '</a>';
+				if ( isset($attachments[$k+1]) )
+					echo ' &mdash; <a href="' . get_permalink( $attachments[$k+1]->ID ) . '">' . __( 'Next Photo &raquo;', 'the-bootstrap' ) . '</a>';
+				?>
+			</span>
+		</nav><!-- #nav-single -->
+
+		<?php tha_entry_before(); ?>
+		<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+			<?php tha_entry_top(); ?>
+			<div class="entry-content entry-attachment">
+				<figure class="attachment">
+					<?php
+						// If there is more than 1 attachment in a gallery
+						if ( $total_images > 1 ) {
+							if ( isset( $attachments[ ++$k ] ) ) {
+								// get the URL of the next image attachment
+								$next_attachment_url = get_attachment_link( $attachments[ $k ]->ID );
 							}
-					
-					// Start to display EXIF and IPTC data of digital photograph
-					       if ( $imgmeta['image_meta']['created_timestamp'] ) { 
-					           echo __("Date Taken","wpbootstrap") . ": " . date("d-M-Y H:i:s", $imgmeta['image_meta']['created_timestamp'])."<br />"; }
-					       if ( $imgmeta['image_meta']['copyright'] ) { 
-					           echo __("Copyright","wpbootstrap") . ": " . $imgmeta['image_meta']['copyright']."<br />"; }
-					       if ( $imgmeta['image_meta']['credit'] ) { 
-					           echo __("Credit","wpbootstrap") . ": " . $imgmeta['image_meta']['credit']."<br />"; }
-					       if ( $imgmeta['image_meta']['title'] ) { 
-					           echo __("Title","wpbootstrap") . ": " . $imgmeta['image_meta']['title']."<br />"; }
-					       if ( $imgmeta['image_meta']['caption'] ) { 
-					           echo __("Caption","wpbootstrap") . ": " . $imgmeta['image_meta']['caption']."<br />"; }
-					       if ( $imgmeta['image_meta']['camera'] ) { 
-					           echo __("Camera","wpbootstrap") . ": " . $imgmeta['image_meta']['camera']."<br />"; }
-					       if ( $imgmeta['image_meta']['focal_length'] ) { 
-					           echo __("Focal Length","wpbootstrap") . ": " . $imgmeta['image_meta']['focal_length']."mm<br />"; }
-					       if ( $imgmeta['image_meta']['aperture'] ) { 
-					           echo __("Aperture","wpbootstrap") . ": f/" . $imgmeta['image_meta']['aperture']."<br />"; }
-					       if ( $imgmeta['image_meta']['iso'] ) { 
-					           echo __("ISO","wpbootstrap") . ": " . $imgmeta['image_meta']['iso']."<br />"; }
-					       if ( $pshutter ) { 
-					           echo __("Shutter Speed","wpbootstrap") . ": " . $pshutter . "<br />"; }
-					   ?>
-					</div>
-					
-				</div>
-    
-			</div> <!-- end #content -->
+							else {
+								// or get the URL of the first image attachment
+								$next_attachment_url = get_attachment_link( $attachments[ 0 ]->ID );
+							}
+						} else {
+							// or, if there's only 1 image, get the URL of the image
+							$next_attachment_url = wp_get_attachment_url();
+						}
+						
+						list( $src, $width, $height ) = wp_get_attachment_image_src( $post->ID, 'full' );
+						$link_class = ( $GLOBALS['content_width'] > $width ) ? ' attachment-table' : '';
+					?>
+					<a href="<?php echo $next_attachment_url; ?>" title="<?php the_title_attribute(); ?>" rel="attachment" class="thumbnail<?php echo $link_class; ?>">
+						<?php echo wp_get_attachment_image( $post->ID, 'full' ); ?>
+					</a>
 
-<?php get_footer(); ?>
+					<?php if ( $post->post_excerpt ) : ?>
+					<figcaption class="entry-caption">
+						<?php the_excerpt(); ?>
+					</figcaption>
+					<?php endif; ?>
+				</figure><!-- .attachment -->
+			</div><!-- .entry-content -->
+			<?php tha_entry_bottom(); ?>
+		</article><!-- #post-<?php the_ID(); ?> -->
+		<?php tha_entry_after(); ?>
+		
+		<?php tha_content_bottom(); ?>
+	</div><!-- #content -->
+	<?php tha_content_after(); ?>
+</section><!-- #primary -->
+<div id="attachment-comment" class="span8"><?php comments_template(); ?></div>
+<?php
+get_sidebar( 'image' );
+get_footer();
+
+
+/* End of file image.php */
+/* Location: ./wp-content/themes/the-bootstrap/image.php */

@@ -1,513 +1,1080 @@
 <?php
-/*
-Author: Eddie Machado
-URL: htp://themble.com/bones/
+/** functions.php
+ *
+ * @author		Konstantin Obenland
+ * @package		The Bootstrap
+ * @since		1.0.0 - 05.02.2012
+ */
+define("SCRIPT_DEBUG", true);
 
-This is where you can drop your custom functions or
-just edit things like thumbnail sizes, header images, 
-sidebars, comments, ect.
-*/
+if ( ! function_exists( 'the_bootstrap_setup' ) ):
+/**
+ * Sets up theme defaults and registers support for various WordPress features.
+ *
+ * @author	WordPress.org
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_setup() {
+	global $content_width;
+	
+	if ( ! isset( $content_width ) ) {
+		$content_width = 770;
+	}
+	
+	load_theme_textdomain( 'the-bootstrap', get_template_directory() . '/lang' );
+	
+	add_theme_support( 'automatic-feed-links' );
+	
+	add_theme_support( 'post-thumbnails' );
 
-// Get Bones Core Up & Running!
-require_once('library/bones.php');            // core functions (don't remove)
+	add_theme_support( 'post-formats', array(
+		'aside',
+		'chat',
+		'link',
+		'gallery',
+		'status',
+		'quote',
+		'image',
+		'video'
+	) );
+	
+	add_theme_support( 'tha_hooks', array( 'all' ) );
 
-// Shortcodes
-require_once('library/shortcodes.php');
+	if ( version_compare( get_bloginfo( 'version' ), '3.4', '<' ) )
+		// Custom Theme Options
+		require_once( get_template_directory() . '/inc/theme-options.php' );
+	else
+		// Implement the Theme Customizer script
+		require_once( get_template_directory() . '/inc/theme-customizer.php' );
+	
+	/**
+	 * Custom template tags for this theme.
+	 */
+	require_once( get_template_directory() . '/inc/template-tags.php' );
+	
+	/**
+	 * Implement the Custom Header feature
+	 */
+	require_once( get_template_directory() . '/inc/custom-header.php' );
+	
+	/**
+	 * Custom Nav Menu handler for the Navbar.
+	 */
+	require_once( get_template_directory() . '/inc/nav-menu-walker.php' );
+	
+	/**
+	 * Theme Hook Alliance
+	 */
+	require_if_theme_supports( 'tha_hooks', get_template_directory() . '/inc/tha-theme-hooks.php' );
+	
+	/**
+	 * Including three menu (header-menu, primary and footer-menu).
+	 * Primary is wrapping in a navbar containing div (wich support responsive variation)
+	 * Header-menu and Footer-menu are inside pills dropdown menu
+	 * 
+	 * @since	1.2.2 - 07.04.2012
+	 * @see		http://codex.wordpress.org/Function_Reference/register_nav_menus
+	 */
+	register_nav_menus( array(
+		'primary'		=>	__( 'Main Navigation', 'the-bootstrap' ),
+		'header-menu'  	=>	__( 'Header Menu', 'the-bootstrap' ),
+		'footer-menu' 	=>	__( 'Footer Menu', 'the-bootstrap' )
+	) );
+	
+} // the_bootstrap_setup
+endif;
+add_action( 'after_setup_theme', 'the_bootstrap_setup' );
 
-// Admin Functions (commented out by default)
-// require_once('library/admin.php');         // custom admin functions
 
-// Custom Backend Footer
-add_filter('admin_footer_text', 'wp_bootstrap_custom_admin_footer');
-function wp_bootstrap_custom_admin_footer() {
-	echo '<span id="footer-thankyou">Developed by <a href="http://320press.com" target="_blank">320press</a></span>. Built using <a href="http://themble.com/bones" target="_blank">Bones</a>.';
+/**
+ * Returns the options object for The Bootstrap.
+ *
+ * @author	Automattic
+ * @since	1.3.0 - 06.04.2012
+ *
+ * @return	stdClass	Theme Options
+ */
+function the_bootstrap_options() {
+	return (object) wp_parse_args(
+		get_option( 'the_bootstrap_theme_options', array() ),
+		the_bootstrap_get_default_theme_options()
+	);
 }
 
-// adding it to the admin area
-add_filter('admin_footer_text', 'wp_bootstrap_custom_admin_footer');
 
-// Set content width
-if ( ! isset( $content_width ) ) $content_width = 580;
+/**
+ * Returns the default options for The Bootstrap.
+ *
+ * @author	Automattic
+ * @since	1.3.0 - 06.04.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_get_default_theme_options() {
+	$default_theme_options	=	array(
+		'theme_layout'		=>	'content-sidebar',
+		'navbar_site_name'	=>	false,
+		'navbar_searchform'	=>	true,
+		'navbar_inverse'	=>	true,
+		'navbar_position'	=>	'static',
+	);
 
-/************* THUMBNAIL SIZE OPTIONS *************/
+	return apply_filters( 'the_bootstrap_default_theme_options', $default_theme_options );
+}
 
-// Thumbnail sizes
-add_image_size( 'wpbs-featured', 780, 300, true );
-add_image_size( 'wpbs-featured-home', 970, 311, true);
-add_image_size( 'wpbs-featured-carousel', 970, 400, true);
 
-/* 
-to add more sizes, simply copy a line from above 
-and change the dimensions & name. As long as you
-upload a "featured image" as large as the biggest
-set width or height, all the other sizes will be
-auto-cropped.
+/**
+ * Adds The Bootstrap layout classes to the array of body classes.
+ *
+ * @author	WordPress.org
+ * @since	1.3.0 - 06.04.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_layout_classes( $existing_classes ) {
+	$classes = array( the_bootstrap_options()->theme_layout );
+	$classes = apply_filters( 'the_bootstrap_layout_classes', $classes );
 
-To call a different size, simply change the text
-inside the thumbnail function.
+	return array_merge( $existing_classes, $classes );
+}
+add_filter( 'body_class', 'the_bootstrap_layout_classes' );
 
-For example, to call the 300 x 300 sized image, 
-we would use the function:
-<?php the_post_thumbnail( 'bones-thumb-300' ); ?>
-for the 600 x 100 image:
-<?php the_post_thumbnail( 'bones-thumb-600' ); ?>
 
-You can change the names and dimensions to whatever
-you like. Enjoy!
-*/
+/**
+ * Adds Custom Background support
+ *
+ * @author	Konstantin Obenland
+ * @since	1.2.5 - 11.04.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_custom_background_setup() {
+	
+	$args = apply_filters( 'the_bootstrap_custom_background_args',  array(
+		'default-color'	=>	'EFEFEF',
+	) );
+	
+	add_theme_support( 'custom-background', $args );
+	
+	if ( ! function_exists( 'wp_get_theme' ) ) {
+		// Compat: Versions of WordPress prior to 3.4.
+		define( 'BACKGROUND_COLOR', $args['default-color'] );
+		add_custom_background();
+	}
+}
+add_action( 'after_setup_theme', 'the_bootstrap_custom_background_setup' );
 
-/************* ACTIVE SIDEBARS ********************/
 
-// Sidebars & Widgetizes Areas
-function wp_bootstrap_register_sidebars() {
-    register_sidebar(array(
-    	'id' => 'sidebar1',
-    	'name' => 'Main Sidebar',
-    	'description' => 'Used on every page BUT the homepage page template.',
-    	'before_widget' => '<div id="%1$s" class="widget %2$s">',
-    	'after_widget' => '</div>',
-    	'before_title' => '<h4 class="widgettitle">',
-    	'after_title' => '</h4>',
-    ));
-    
-    register_sidebar(array(
-    	'id' => 'sidebar2',
-    	'name' => 'Homepage Sidebar',
-    	'description' => 'Used only on the homepage page template.',
-    	'before_widget' => '<div id="%1$s" class="widget %2$s">',
-    	'after_widget' => '</div>',
-    	'before_title' => '<h4 class="widgettitle">',
-    	'after_title' => '</h4>',
-    ));
-    
-    register_sidebar(array(
-      'id' => 'footer1',
-      'name' => 'Footer 1',
-      'before_widget' => '<div id="%1$s" class="widget col-sm-4 %2$s">',
-      'after_widget' => '</div>',
-      'before_title' => '<h4 class="widgettitle">',
-      'after_title' => '</h4>',
-    ));
+/**
+ * Register the sidebars.
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_widgets_init() {
 
-    register_sidebar(array(
-      'id' => 'footer2',
-      'name' => 'Footer 2',
-      'before_widget' => '<div id="%1$s" class="widget col-sm-4 %2$s">',
-      'after_widget' => '</div>',
-      'before_title' => '<h4 class="widgettitle">',
-      'after_title' => '</h4>',
-    ));
+	register_sidebar( array(
+		'name'			=>	__( 'Main Sidebar', 'the-bootstrap' ),
+		'id'			=>	'main',
+		'before_widget'	=>	'<aside id="%1$s" class="widget well %2$s">',
+		'after_widget'	=>	'</aside>',
+		'before_title'	=>	'<h2 class="widget-title">',
+		'after_title'	=>	'</h2>',
+	) );
+	
+	register_sidebar( array(
+		'name'			=>	__( 'Image Sidebar', 'the-bootstrap' ),
+		'description'	=>	__( 'Shown on image attachment pages.', 'the-bootstrap' ),
+		'id'			=>	'image',
+		'before_widget'	=>	'<aside id="%1$s" class="widget well %2$s">',
+		'after_widget'	=>	'</aside>',
+		'before_title'	=>	'<h2 class="widget-title">',
+		'after_title'	=>	'</h2>',
+	) );
 
-    register_sidebar(array(
-      'id' => 'footer3',
-      'name' => 'Footer 3',
-      'before_widget' => '<div id="%1$s" class="widget col-sm-4 %2$s">',
-      'after_widget' => '</div>',
-      'before_title' => '<h4 class="widgettitle">',
-      'after_title' => '</h4>',
-    ));
-    
-    
-    /* 
-    to add more sidebars or widgetized areas, just copy
-    and edit the above sidebar code. In order to call 
-    your new sidebar just use the following code:
-    
-    Just change the name to whatever your new
-    sidebar's id is, for example:
-    
-    To call the sidebar in your template, you can just copy
-    the sidebar.php file and rename it to your sidebar's name.
-    So using the above example, it would be:
-    sidebar-sidebar2.php
-    
-    */
-} // don't remove this bracket!
+	include_once( 'inc/the-bootstrap-image-meta-widget.php' );
+	register_widget( 'The_Bootstrap_Image_Meta_Widget' );
+	
+	include_once( 'inc/the-bootstrap-gallery-widget.php' );
+	register_widget( 'The_Bootstrap_Gallery_Widget' );
+}
+add_action( 'widgets_init', 'the_bootstrap_widgets_init' );
 
-/************* COMMENT LAYOUT *********************/
+
+/**
+ * Registration of theme scripts and styles
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_register_scripts_styles() {
+	if ( ! is_admin() ) {
+		$theme_version = _the_bootstrap_version();
+		$suffix = ( defined('SCRIPT_DEBUG') AND SCRIPT_DEBUG ) ? '' : '.min';
+			
+		/**
+		 * Scripts
+		 */
+		wp_register_script(
+			'tw-bootstrap',
+			get_template_directory_uri() . "/js/bootstrap{$suffix}.js",
+			array('jquery'),
+			'2.0.3',
+			true
+		);
 		
-// Comment Layout
-function wp_bootstrap_comments($comment, $args, $depth) {
-   $GLOBALS['comment'] = $comment; ?>
-	<li <?php comment_class(); ?>>
-		<article id="comment-<?php comment_ID(); ?>" class="clearfix">
-			<div class="comment-author vcard clearfix">
-				<div class="avatar col-sm-3">
-					<?php echo get_avatar( $comment, $size='75' ); ?>
-				</div>
-				<div class="col-sm-9 comment-text">
-					<?php printf('<h4>%s</h4>', get_comment_author_link()) ?>
-					<?php edit_comment_link(__('Edit','wpbootstrap'),'<span class="edit-comment btn btn-sm btn-info"><i class="glyphicon-white glyphicon-pencil"></i>','</span>') ?>
-                    
-                    <?php if ($comment->comment_approved == '0') : ?>
-       					<div class="alert-message success">
-          				<p><?php _e('Your comment is awaiting moderation.','wpbootstrap') ?></p>
-          				</div>
-					<?php endif; ?>
-                    
-                    <?php comment_text() ?>
-                    
-                    <time datetime="<?php echo comment_time('Y-m-j'); ?>"><a href="<?php echo htmlspecialchars( get_comment_link( $comment->comment_ID ) ) ?>"><?php comment_time('F jS, Y'); ?> </a></time>
-                    
-					<?php comment_reply_link(array_merge( $args, array('depth' => $depth, 'max_depth' => $args['max_depth']))) ?>
-                </div>
-			</div>
-		</article>
-    <!-- </li> is added by wordpress automatically -->
-<?php
-} // don't remove this bracket!
+		wp_register_script(
+			'the-bootstrap',
+			get_template_directory_uri() . "/js/the-bootstrap{$suffix}.js",
+			array('tw-bootstrap'),
+			$theme_version,
+			true
+		);
+				
+		/**
+		 * Styles
+		 */
+		wp_register_style(
+			'tw-bootstrap',
+			get_template_directory_uri() . "/css/bootstrap{$suffix}.css",
+			array(),
+			'2.0.3'
+		);
+		
+		wp_register_style(
+			'the-bootstrap',
+			get_template_directory_uri() . "/style{$suffix}.css",
+			array('tw-bootstrap'),
+			$theme_version
+		);
+	}
+}
+add_action( 'init', 'the_bootstrap_register_scripts_styles' );
 
-// Display trackbacks/pings callback function
-function list_pings($comment, $args, $depth) {
-       $GLOBALS['comment'] = $comment;
-?>
-        <li id="comment-<?php comment_ID(); ?>"><i class="icon icon-share-alt"></i>&nbsp;<?php comment_author_link(); ?>
-<?php 
 
+/**
+ * Properly enqueue frontend scripts
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_print_scripts() {
+	wp_enqueue_script( 'the-bootstrap' );
+}
+add_action( 'wp_enqueue_scripts', 'the_bootstrap_print_scripts' );
+
+
+/**
+ * Adds IE specific scripts
+ * 
+ * Respond.js has to be loaded after Theme styles
+ *
+ * @author	Konstantin Obenland
+ * @since	1.7.0 - 11.06.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_print_ie_scripts() {
+	?>
+	<!--[if lt IE 9]>
+		<script src="<?php echo get_template_directory_uri(); ?>/js/html5shiv.min.js" type="text/javascript"></script>
+		<script src="<?php echo get_template_directory_uri(); ?>/js/respond.min.js" type="text/javascript"></script>
+	<![endif]-->
+	<?php
+}
+add_action( 'wp_head', 'the_bootstrap_print_ie_scripts', 11 );
+
+
+/**
+ * Properly enqueue comment-reply script
+ *
+ * @author	Konstantin Obenland
+ * @since	1.4.0 - 08.05.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_comment_reply() {
+	if ( get_option( 'thread_comments' ) ) {
+		wp_enqueue_script( 'comment-reply' );
+	}
+}
+add_action( 'comment_form_before', 'the_bootstrap_comment_reply' );
+
+
+/**
+ * Properly enqueue frontend styles
+ *
+ * Since 'tw-bootstrap' was registered as a dependency, it'll get enqueued
+ * automatically
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_print_styles() {
+	if ( is_child_theme() ) {
+		wp_enqueue_style( 'the-bootstrap-child', get_stylesheet_uri(), array( 'the-bootstrap' ) );
+	} else {
+		wp_enqueue_style( 'the-bootstrap' );
+	}
+	
+	if ( 'static' != the_bootstrap_options()->navbar_position ) {
+		$top_bottom	=	str_replace( 'navbar-fixed-', '', the_bootstrap_options()->navbar_position );
+		$css		=	"body > .container{margin-{$top_bottom}:68px;}@media(min-width: 980px){body > .container{margin-{$top_bottom}:58px;}}";
+	
+		if ( is_admin_bar_showing() AND 'top' == $top_bottom )
+			$css	.=	'.navbar.navbar-fixed-top{margin-top:28px;}';
+	
+		if ( function_exists( 'wp_add_inline_style' ) )
+			wp_add_inline_style( 'the-bootstrap', $css );
+		else
+			echo "<style type='text/css'>\n{$css}\n</style>\n";
+	}
+}
+add_action( 'wp_enqueue_scripts', 'the_bootstrap_print_styles' );
+
+
+if ( ! function_exists( 'the_bootstrap_credits' ) ) :
+/**
+ * Prints HTML with meta information for the current post-date/time and author,
+ * comment and edit link
+ *
+ * @author	Konstantin Obenland
+ * @since	1.2.2 - 07.04.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_credits() {
+	printf(
+		'<span class="credits alignleft">' . __( '&copy; %1$s <a href="%2$s">%3$s</a>, all rights reserved.', 'the-bootstrap' ) . '</span>',
+		date( 'Y' ),
+		home_url( '/' ),
+		get_bloginfo( 'name' )
+	);
+}
+endif;
+
+
+/**
+ * Returns the blogname if no title was set.
+ *
+ * @author	Konstantin Obenland
+ * @since	1.1.0 - 18.03.2012
+ *
+ * @param	string	$title
+ * @param	string	$sep
+ *
+ * @return	string
+ */
+function the_bootstrap_wp_title( $title, $sep ) {
+	
+	if ( ! is_feed() ) {
+		$title .= get_bloginfo( 'name' );
+		
+		if ( is_front_page() ) {
+			$title .= " {$sep} " . get_bloginfo( 'description' );
+		}
+	}
+
+	return $title;
+}
+add_filter( 'wp_title', 'the_bootstrap_wp_title', 1, 2 );
+
+
+/**
+ * Returns a "Continue Reading" link for excerpts
+ *
+ * @author	WordPress.org
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$more
+ *
+ * @return	string
+ */
+function the_bootstrap_continue_reading_link() {
+	return ' <a href="'. esc_url( get_permalink() ) . '">' . __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) . '</a>';
 }
 
-/************* SEARCH FORM LAYOUT *****************/
 
-/****************** password protected post form *****/
-
-add_filter( 'the_password_form', 'custom_password_form' );
-
-function custom_password_form() {
-	global $post;
-	$label = 'pwbox-'.( empty( $post->ID ) ? rand() : $post->ID );
-	$o = '<div class="clearfix"><form class="protected-post-form" action="' . get_option('siteurl') . '/wp-login.php?action=postpass" method="post">
-	' . '<p>' . __( "This post is password protected. To view it please enter your password below:" ,'wpbootstrap') . '</p>' . '
-	<label for="' . $label . '">' . __( "Password:" ,'wpbootstrap') . ' </label><div class="input-append"><input name="post_password" id="' . $label . '" type="password" size="20" /><input type="submit" name="Submit" class="btn btn-primary" value="' . esc_attr__( "Submit",'wpbootstrap' ) . '" /></div>
-	</form></div>
-	';
-	return $o;
+/**
+ * Replaces "[...]" (appended to automatically generated excerpts) with an ellipsis and the_bootstrap_continue_reading_link().
+ *
+ * To override this in a child theme, remove the filter and add your own
+ * function tied to the excerpt_more filter hook.
+ *
+ * @author	WordPress.org
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$more
+ *
+ * @return	string
+ */
+function the_bootstrap_auto_excerpt_more( $more ) {
+	return '&hellip;' . the_bootstrap_continue_reading_link();
 }
+add_filter( 'excerpt_more', 'the_bootstrap_auto_excerpt_more' );
 
-/*********** update standard wp tag cloud widget so it looks better ************/
 
-add_filter( 'widget_tag_cloud_args', 'my_widget_tag_cloud_args' );
+/**
+ * Adds a pretty "Continue Reading" link to custom post excerpts.
+ *
+ * To override this link in a child theme, remove the filter and add your own
+ * function tied to the get_the_excerpt filter hook.
+ *
+ * @author	WordPress.org
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$output
+ *
+ * @return	string
+ */
+function the_bootstrap_custom_excerpt_more( $output ) {
+	if ( has_excerpt() AND ! is_attachment() ) {
+		$output .= the_bootstrap_continue_reading_link();
+	}
+	return $output;
+}
+add_filter( 'get_the_excerpt', 'the_bootstrap_custom_excerpt_more' );
 
-function my_widget_tag_cloud_args( $args ) {
-	$args['number'] = 20; // show less tags
-	$args['largest'] = 9.75; // make largest and smallest the same - i don't like the varying font-size look
-	$args['smallest'] = 9.75;
-	$args['unit'] = 'px';
+
+/**
+ * Get the wp_nav_menu() fallback, wp_page_menu(), to show a home link.
+ *
+ * @author	WordPress.org
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	array	$args
+ *
+ * @return	array
+ */
+function the_bootstrap_page_menu_args( $args ) {
+	$args['show_home'] = true;
 	return $args;
 }
+add_filter( 'wp_page_menu_args', 'the_bootstrap_page_menu_args' );
 
-// filter tag clould output so that it can be styled by CSS
-function add_tag_class( $taglinks ) {
-    $tags = explode('</a>', $taglinks);
-    $regex = "#(.*tag-link[-])(.*)(' title.*)#e";
 
-    foreach( $tags as $tag ) {
-    	$tagn[] = preg_replace($regex, "('$1$2 label tag-'.get_tag($2)->slug.'$3')", $tag );
-    }
-
-    $taglinks = implode('</a>', $tagn);
-
-    return $taglinks;
-}
-
-add_action( 'wp_tag_cloud', 'add_tag_class' );
-
-add_filter( 'wp_tag_cloud','wp_tag_cloud_filter', 10, 2) ;
-
-function wp_tag_cloud_filter( $return, $args )
-{
-  return '<div id="tag-cloud">' . $return . '</div>';
-}
-
-// Enable shortcodes in widgets
-add_filter( 'widget_text', 'do_shortcode' );
-
-// Disable jump in 'read more' link
-function remove_more_jump_link( $link ) {
-	$offset = strpos($link, '#more-');
-	if ( $offset ) {
-		$end = strpos( $link, '"',$offset );
-	}
-	if ( $end ) {
-		$link = substr_replace( $link, '', $offset, $end-$offset );
-	}
-	return $link;
-}
-add_filter( 'the_content_more_link', 'remove_more_jump_link' );
-
-// Remove height/width attributes on images so they can be responsive
-add_filter( 'post_thumbnail_html', 'remove_thumbnail_dimensions', 10 );
-add_filter( 'image_send_to_editor', 'remove_thumbnail_dimensions', 10 );
-
-function remove_thumbnail_dimensions( $html ) {
-    $html = preg_replace( '/(width|height)=\"\d*\"\s/', "", $html );
-    return $html;
-}
-
-// Add the Meta Box to the homepage template
-function add_homepage_meta_box() {  
-	global $post;
-
-	// Only add homepage meta box if template being used is the homepage template
-	// $post_id = isset($_GET['post']) ? $_GET['post'] : (isset($_POST['post_ID']) ? $_POST['post_ID'] : "");
-	$post_id = $post->ID;
-	$template_file = get_post_meta($post_id,'_wp_page_template',TRUE);
-
-	if ( $template_file == 'page-homepage.php' ){
-	    add_meta_box(  
-	        'homepage_meta_box', // $id  
-	        'Optional Homepage Tagline', // $title  
-	        'show_homepage_meta_box', // $callback  
-	        'page', // $page  
-	        'normal', // $context  
-	        'high'); // $priority  
-    }
-}
-
-add_action( 'add_meta_boxes', 'add_homepage_meta_box' );
-
-// Field Array  
-$prefix = 'custom_';  
-$custom_meta_fields = array(  
-    array(  
-        'label'=> 'Homepage tagline area',  
-        'desc'  => 'Displayed underneath page title. Only used on homepage template. HTML can be used.',  
-        'id'    => $prefix.'tagline',  
-        'type'  => 'textarea' 
-    )  
-);  
-
-// The Homepage Meta Box Callback  
-function show_homepage_meta_box() {  
-  global $custom_meta_fields, $post;
-
-  // Use nonce for verification
-  wp_nonce_field( basename( __FILE__ ), 'wpbs_nonce' );
+/**
+ * Filter in a link to a content ID attribute for the next/previous image links on image attachment pages
+ *
+ * @author	Automattic
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$url
+ * @param	int		$id
+ *
+ * @return	string
+ */
+function the_bootstrap_enhanced_image_navigation( $url, $id ) {
     
-  // Begin the field table and loop
-  echo '<table class="form-table">';
-
-  foreach ( $custom_meta_fields as $field ) {
-      // get value of this field if it exists for this post  
-      $meta = get_post_meta($post->ID, $field['id'], true);  
-      // begin a table row with  
-      echo '<tr> 
-              <th><label for="'.$field['id'].'">'.$field['label'].'</label></th> 
-              <td>';  
-              switch($field['type']) {  
-                  // text  
-                  case 'text':  
-                      echo '<input type="text" name="'.$field['id'].'" id="'.$field['id'].'" value="'.$meta.'" size="60" /> 
-                          <br /><span class="description">'.$field['desc'].'</span>';  
-                  break;
-                  
-                  // textarea  
-                  case 'textarea':  
-                      echo '<textarea name="'.$field['id'].'" id="'.$field['id'].'" cols="80" rows="4">'.$meta.'</textarea> 
-                          <br /><span class="description">'.$field['desc'].'</span>';  
-                  break;  
-              } //end switch  
-      echo '</td></tr>';  
-  } // end foreach  
-  echo '</table>'; // end table  
-}  
-
-// Save the Data  
-function save_homepage_meta( $post_id ) {  
-
-    global $custom_meta_fields;  
-  
-    // verify nonce  
-    if ( !isset( $_POST['wpbs_nonce'] ) || !wp_verify_nonce($_POST['wpbs_nonce'], basename(__FILE__)) )  
-        return $post_id;
-
-    // check autosave
-    if ( defined('DOING_AUTOSAVE') && DOING_AUTOSAVE )
-        return $post_id;
-
-    // check permissions
-    if ( 'page' == $_POST['post_type'] ) {
-        if ( !current_user_can( 'edit_page', $post_id ) )
-            return $post_id;
-        } elseif ( !current_user_can( 'edit_post', $post_id ) ) {
-            return $post_id;
+	if ( is_attachment() AND wp_attachment_is_image( $id ) ) {
+		$image = get_post( $id );
+		if ( $image->post_parent AND $image->post_parent != $id )
+			$url .= '#primary';
     }
-  
-    // loop through fields and save the data  
-    foreach ( $custom_meta_fields as $field ) {
-        $old = get_post_meta( $post_id, $field['id'], true );
-        $new = $_POST[$field['id']];
-
-        if ($new && $new != $old) {
-            update_post_meta( $post_id, $field['id'], $new );
-        } elseif ( '' == $new && $old ) {
-            delete_post_meta( $post_id, $field['id'], $old );
-        }
-    } // end foreach
+    
+    return $url;
 }
-add_action( 'save_post', 'save_homepage_meta' );
+add_filter( 'attachment_link', 'the_bootstrap_enhanced_image_navigation', 10, 2 );
 
-// Add thumbnail class to thumbnail links
-function add_class_attachment_link( $html ) {
-    $postid = get_the_ID();
-    $html = str_replace( '<a','<a class="thumbnail"',$html );
-    return $html;
-}
-add_filter( 'wp_get_attachment_link', 'add_class_attachment_link', 10, 1 );
 
-// Add lead class to first paragraph
-function first_paragraph( $content ){
-    global $post;
-
-    // if we're on the homepage, don't add the lead class to the first paragraph of text
-    if( is_page_template( 'page-homepage.php' ) )
-        return $content;
-    else
-        return preg_replace('/<p([^>]+)?>/', '<p$1 class="lead">', $content, 1);
-}
-add_filter( 'the_content', 'first_paragraph' );
-
-// Menu output mods
-class Bootstrap_walker extends Walker_Nav_Menu{
-
-  function start_el(&$output, $object, $depth = 0, $args = Array(), $current_object_id = 0){
-
-	 global $wp_query;
-	 $indent = ( $depth ) ? str_repeat( "\t", $depth ) : '';
+/**
+ * Displays comment list, when there are any
+ *
+ * @author	Konstantin Obenland
+ * @since	1.7.0 - 16.06.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_comments_list() {
+	if ( post_password_required() ) : ?>
+		<div id="comments">
+			<p class="nopassword"><?php _e( 'This post is password protected. Enter the password to view any comments.', 'the-bootstrap' ); ?></p>
+		</div><!-- #comments -->
+		<?php
+		return;
+	endif;
 	
-	 $class_names = $value = '';
 	
-		// If the item has children, add the dropdown class for bootstrap
-		if ( $args->has_children ) {
-			$class_names = "dropdown ";
-		}
-	
-		$classes = empty( $object->classes ) ? array() : (array) $object->classes;
+	if ( have_comments() ) : ?>
+		<div id="comments">
+			<h2 id="comments-title">
+				<?php printf( _n( 'One thought on &ldquo;%2$s&rdquo;', '%1$s thoughts on &ldquo;%2$s&rdquo;', get_comments_number(), 'the-bootstrap' ),
+						number_format_i18n( get_comments_number() ), '<span>' . get_the_title() . '</span>' ); ?>
+			</h2>
 		
-		$class_names .= join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $object ) );
-		$class_names = ' class="'. esc_attr( $class_names ) . '"';
-       
-   	$output .= $indent . '<li id="menu-item-'. $object->ID . '"' . $value . $class_names .'>';
-
-   	$attributes  = ! empty( $object->attr_title ) ? ' title="'  . esc_attr( $object->attr_title ) .'"' : '';
-   	$attributes .= ! empty( $object->target )     ? ' target="' . esc_attr( $object->target     ) .'"' : '';
-   	$attributes .= ! empty( $object->xfn )        ? ' rel="'    . esc_attr( $object->xfn        ) .'"' : '';
-   	$attributes .= ! empty( $object->url )        ? ' href="'   . esc_attr( $object->url        ) .'"' : '';
-
-   	// if the item has children add these two attributes to the anchor tag
-   	// if ( $args->has_children ) {
-		  // $attributes .= ' class="dropdown-toggle" data-toggle="dropdown"';
-    // }
-
-    $item_output = $args->before;
-    $item_output .= '<a'. $attributes .'>';
-    $item_output .= $args->link_before .apply_filters( 'the_title', $object->title, $object->ID );
-    $item_output .= $args->link_after;
-
-    // if the item has children add the caret just before closing the anchor tag
-    if ( $args->has_children ) {
-    	$item_output .= '<b class="caret"></b></a>';
-    }
-    else {
-    	$item_output .= '</a>';
-    }
-
-    $item_output .= $args->after;
-
-    $output .= apply_filters( 'walker_nav_menu_start_el', $item_output, $object, $depth, $args );
-  } // end start_el function
-        
-  function start_lvl(&$output, $depth = 0, $args = Array()) {
-    $indent = str_repeat("\t", $depth);
-    $output .= "\n$indent<ul class=\"dropdown-menu\">\n";
-  }
-      
-	function display_element( $element, &$children_elements, $max_depth, $depth=0, $args, &$output ){
-    $id_field = $this->db_fields['id'];
-    if ( is_object( $args[0] ) ) {
-        $args[0]->has_children = ! empty( $children_elements[$element->$id_field] );
-    }
-    return parent::display_element( $element, $children_elements, $max_depth, $depth, $args, $output );
-  }        
+			<?php the_bootstrap_comment_nav(); ?>
+		
+			<ol class="commentlist unstyled">
+				<?php wp_list_comments( array( 'callback' => 'the_bootstrap_comment' ) ); ?>
+			</ol><!-- .commentlist .unstyled -->
+		
+			<?php the_bootstrap_comment_nav(); ?>
+		
+		</div><!-- #comments -->
+	<?php endif;
 }
+add_action( 'comment_form_before', 'the_bootstrap_comments_list', 0 );
+add_action( 'comment_form_comments_closed', 'the_bootstrap_comments_list', 1 );
 
-add_editor_style('editor-style.css');
 
-// Add Twitter Bootstrap's standard 'active' class name to the active nav link item
-add_filter('nav_menu_css_class', 'add_active_class', 10, 2 );
+/**
+ * Echoes comments-are-closed message when post type supports comments and we're
+ * not on a page
+ *
+ * @author	Konstantin Obenland
+ * @since	1.7.0 - 16.06.2012
+ *
+ * @return	void
+ */
+function the_bootstrap_comments_closed() {
+	if ( ! is_page() AND post_type_supports( get_post_type(), 'comments' ) ) : ?>
+		<p class="nocomments"><?php _e( 'Comments are closed.', 'the-bootstrap' ); ?></p>
+	<?php endif;
+}
+add_action( 'comment_form_comments_closed', 'the_bootstrap_comments_closed' );
 
-function add_active_class($classes, $item) {
-	if( $item->menu_item_parent == 0 && in_array('current-menu-item', $classes) ) {
-    $classes[] = "active";
+
+/**
+ * Filters comments_form() default arguments
+ *
+ * @author	Konstantin Obenland
+ * @since	1.7.0 - 16.06.2012
+ *
+ * @param	array	$defaults
+ *
+ * @return	array
+ */
+function the_bootstrap_comment_form_defaults( $defaults ) {
+	return wp_parse_args( array(
+		'comment_field'			=>	'<div class="comment-form-comment control-group"><label class="control-label" for="comment">' . _x( 'Comment', 'noun', 'the-bootstrap' ) . '</label><div class="controls"><textarea class="span7" id="comment" name="comment" rows="8" aria-required="true"></textarea></div></div>',
+		'comment_notes_before'	=>	'',
+		'comment_notes_after'	=>	'<div class="form-allowed-tags control-group"><label class="control-label">' . sprintf( __( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: %s', 'the-bootstrap' ), '</label><div class="controls"><pre>' . allowed_tags() . '</pre></div>' ) . '</div>
+									 <div class="form-actions">',
+		'title_reply'			=>	'<legend>' . __( 'Leave a reply', 'the-bootstrap' ) . '</legend>',
+		'title_reply_to'		=>	'<legend>' . __( 'Leave a reply to %s', 'the-bootstrap' ). '</legend>',
+		'must_log_in'			=>	'<div class="must-log-in control-group controls">' . sprintf( __( 'You must be <a href="%s">logged in</a> to post a comment.', 'the-bootstrap' ), wp_login_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) . '</div>',
+		'logged_in_as'			=>	'<div class="logged-in-as control-group controls">' . sprintf( __( 'Logged in as <a href="%1$s">%2$s</a>. <a href="%3$s" title="Log out of this account">Log out?</a>', 'the-bootstrap' ), admin_url( 'profile.php' ), wp_get_current_user()->display_name, wp_logout_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) . '</div>',
+	), $defaults );
+}
+add_filter( 'comment_form_defaults', 'the_bootstrap_comment_form_defaults' );
+
+
+if ( ! function_exists( 'the_bootstrap_comment' ) ) :
+/**
+ * Template for comments and pingbacks.
+ *
+ * To override this walker in a child theme without modifying the comments template
+ * simply create your own the_bootstrap_comment(), and that function will be used instead.
+ *
+ * Used as a callback by wp_list_comments() for displaying the comments.
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	object	$comment	Comment data object.
+ * @param	array	$args
+ * @param	int		$depth		Depth of comment in reference to parents.
+ *
+ * @return	void
+ */
+function the_bootstrap_comment( $comment, $args, $depth ) {
+	$GLOBALS['comment'] = $comment;
+	if ( 'pingback' == $comment->comment_type OR 'trackback' == $comment->comment_type ) : ?>
+	
+		<li id="li-comment-<?php comment_ID(); ?>" <?php comment_class(); ?>>
+			<p class="row">
+				<strong class="ping-label span1"><?php _e( 'Pingback:', 'the-bootstrap' ); ?></strong>
+				<span class="span7"><?php comment_author_link(); edit_comment_link( __( 'Edit', 'the-bootstrap' ), '<span class="sep">&nbsp;</span><span class="edit-link label">', '</span>' ); ?></span>
+			</p>
+	
+	<?php else:
+		$offset	=	$depth - 1;
+		$span	=	7 - $offset; ?>
+		
+		<li  id="li-comment-<?php comment_ID(); ?>" <?php comment_class(); ?>>
+			<article id="comment-<?php comment_ID(); ?>" class="comment row">
+				<div class="comment-author-avatar span1<?php if ($offset) echo " offset{$offset}"; ?>">
+					<?php echo get_avatar( $comment, 70 ); ?>
+				</div>
+				<footer class="comment-meta span<?php echo $span; ?>">
+					<p class="comment-author vcard">
+						<?php
+							/* translators: 1: comment author, 2: date and time */
+							printf( __( '%1$s <span class="says">said</span> on %2$s:', 'the-bootstrap' ),
+								sprintf( '<span class="fn">%s</span>', get_comment_author_link() ),
+								sprintf( '<a href="%1$s"><time pubdate datetime="%2$s">%3$s</time></a>',
+									esc_url( get_comment_link( $comment->comment_ID ) ),
+									get_comment_time( 'c' ),
+									/* translators: 1: date, 2: time */
+									sprintf( __( '%1$s at %2$s', 'the-bootstrap' ), get_comment_date(), get_comment_time() )
+								)
+							);
+							edit_comment_link( __( 'Edit', 'the-bootstrap' ), '<span class="sep">&nbsp;</span><span class="edit-link label">', '</span>' ); ?>
+					</p><!-- .comment-author .vcard -->
+	
+					<?php if ( ! $comment->comment_approved ) : ?>
+					<div class="comment-awaiting-moderation alert alert-info"><em><?php _e( 'Your comment is awaiting moderation.', 'the-bootstrap' ); ?></em></div>
+					<?php endif; ?>
+	
+				</footer><!-- .comment-meta -->
+	
+				<div class="comment-content span<?php echo $span; ?>">
+					<?php
+					comment_text();
+					comment_reply_link( array_merge( $args, array(
+						'reply_text'	=>	__( 'Reply <span>&darr;</span>', 'the-bootstrap' ),
+						'depth'			=>	$depth,
+						'max_depth'		=>	$args['max_depth']
+					) ) ); ?>
+				</div><!-- .comment-content -->
+			</article><!-- #comment-<?php comment_ID(); ?> .comment -->
+			
+	<?php endif; // comment_type
+}
+endif; // ends check for the_bootstrap_comment()
+
+
+/**
+ * Adds markup to the comment form which is needed to make it work with Bootstrap
+ * needs
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$html
+ *
+ * @return	string
+ */
+function the_bootstrap_comment_form_top() {
+	echo '<div class="form-horizontal">';
+}
+add_action( 'comment_form_top', 'the_bootstrap_comment_form_top' );
+
+
+/**
+ * Adds markup to the comment form which is needed to make it work with Bootstrap
+ * needs
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$html
+ *
+ * @return	string
+ */
+function the_bootstrap_comment_form() {
+	echo '</div></div>';
+}
+add_action( 'comment_form', 'the_bootstrap_comment_form' );
+
+
+/**
+ * Custom author form field for the comments form
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$html
+ *
+ * @return	string
+ */
+function the_bootstrap_comment_form_field_author( $html ) {
+	$commenter	=	wp_get_current_commenter();
+	$req		=	get_option( 'require_name_email' );
+	$aria_req	=	( $req ? " aria-required='true'" : '' );
+	
+	return	'<div class="comment-form-author control-group">
+				<label for="author" class="control-label">' . __( 'Name', 'the-bootstrap' ) . '</label>
+				<div class="controls">
+					<input id="author" name="author" type="text" value="' . esc_attr(  $commenter['comment_author'] ) . '" size="30"' . $aria_req . ' />
+					' . ( $req ? '<p class="help-inline"><span class="required">' . __('required', 'the-bootstrap') . '</span></p>' : '' ) . '
+				</div>
+			</div>';
+}
+add_filter( 'comment_form_field_author', 'the_bootstrap_comment_form_field_author');
+
+
+/**
+ * Custom HTML5 email form field for the comments form
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$html
+ *
+ * @return	string
+ */
+function the_bootstrap_comment_form_field_email( $html ) {
+	$commenter	=	wp_get_current_commenter();
+	$req		=	get_option( 'require_name_email' );
+	$aria_req	=	( $req ? " aria-required='true'" : '' );
+	
+	return	'<div class="comment-form-email control-group">
+				<label for="email" class="control-label">' . __( 'Email', 'the-bootstrap' ) . '</label>
+				<div class="controls">
+					<input id="email" name="email" type="email" value="' . esc_attr(  $commenter['comment_author_email'] ) . '" size="30"' . $aria_req . ' />
+					<p class="help-inline">' . ( $req ? '<span class="required">' . __('required', 'the-bootstrap') . '</span>, ' : '' ) . __( 'will not be published', 'the-bootstrap' ) . '</p>
+				</div>
+			</div>';
+}
+add_filter( 'comment_form_field_email', 'the_bootstrap_comment_form_field_email');
+
+
+/**
+ * Custom HTML5 url form field for the comments form
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$html
+ *
+ * @return	string
+ */
+function the_bootstrap_comment_form_field_url( $html ) {
+	$commenter	=	wp_get_current_commenter();
+	
+	return	'<div class="comment-form-url control-group">
+				<label for="url" class="control-label">' . __( 'Website', 'the-bootstrap' ) . '</label>
+				<div class="controls">
+					<input id="url" name="url" type="url" value="' . esc_attr(  $commenter['comment_author_url'] ) . '" size="30" />
+				</div>
+			</div>';
+}
+add_filter( 'comment_form_field_url', 'the_bootstrap_comment_form_field_url');
+
+
+/**
+ * Adjusts an attechment link to hold the class of 'thumbnail' and make it look
+ * pretty
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$link
+ * @param	int		$id			Post ID.
+ * @param	string	$size		Default is 'thumbnail'. Size of image, either array or string.
+ * @param	bool	$permalink	Default is false. Whether to add permalink to image.
+ * @param	bool	$icon		Default is false. Whether to include icon.
+ * @param	string	$text		Default is false. If string, then will be link text.
+ *
+ * @return	string
+ */
+function the_bootstrap_get_attachment_link( $link, $id, $size, $permalink, $icon, $text ) {
+	return ( ! $text ) ? str_replace( '<a ', '<a class="thumbnail" ', $link ) : $link;
+}
+add_filter( 'wp_get_attachment_link', 'the_bootstrap_get_attachment_link', 10, 6 );
+
+
+/**
+ * Adds the 'hero-unit' class for extra big font on sticky posts
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	array	$classes
+ *
+ * @return	array
+ */
+function the_bootstrap_post_classes( $classes ) {
+
+	if ( is_sticky() AND is_home() ) {
+		$classes[] = 'hero-unit';
 	}
-  
-  return $classes;
+	
+	return $classes;
+}
+add_filter( 'post_class', 'the_bootstrap_post_classes' );
+
+
+/**
+ * Callback function to display galleries (in HTML5)
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$content
+ * @param	array	$attr
+ *
+ * @return	string
+ */
+function the_bootstrap_post_gallery( $content, $attr ) {
+	global $instance, $post;
+	$instance++;
+
+	// We're trusting author input, so let's at least make sure it looks like a valid orderby statement
+	if ( isset( $attr['orderby'] ) ) {
+		$attr['orderby'] = sanitize_sql_orderby( $attr['orderby'] );
+		if ( ! $attr['orderby'] )
+			unset( $attr['orderby'] );
+	}
+
+	extract( shortcode_atts( array(
+		'order'			=>	'ASC',
+		'orderby'		=>	'menu_order ID',
+		'id'			=>	$post->ID,
+		'itemtag'		=>	'figure',
+		'icontag'		=>	'div',
+		'captiontag'	=>	'figcaption',
+		'columns'		=>	3,
+		'size'			=>	'thumbnail',
+		'include'		=>	'',
+		'exclude'		=>	''
+	), $attr ) );
+
+
+	$id = intval( $id );
+	if ( 'RAND' == $order )
+		$orderby = 'none';
+
+	if ( $include ) {
+		$include = preg_replace( '/[^0-9,]+/', '', $include );
+		$_attachments = get_posts( array(
+			'include'			=>	$include,
+			'post_status'		=>	'inherit',
+			'post_type'			=>	'attachment',
+			'post_mime_type'	=>	'image',
+			'order'				=>	$order,
+			'orderby'			=>	$orderby
+		) );
+
+		$attachments = array();
+		foreach ( $_attachments as $key => $val ) {
+			$attachments[$val->ID] = $_attachments[$key];
+		}
+	} elseif ( $exclude ) {
+		$exclude = preg_replace( '/[^0-9,]+/', '', $exclude );
+		$attachments = get_children( array(
+			'post_parent'		=>	$id,
+			'exclude'			=>	$exclude,
+			'post_status'		=>	'inherit',
+			'post_type'			=>	'attachment',
+			'post_mime_type'	=>	'image',
+			'order'				=>	$order,
+			'orderby'			=>	$orderby
+		) );
+	} else {
+		$attachments = get_children( array(
+			'post_parent'		=>	$id,
+			'post_status'		=>	'inherit',
+			'post_type'			=>	'attachment',
+			'post_mime_type'	=>	'image',
+			'order'				=>	$order,
+			'orderby'			=>	$orderby
+		) );
+	}
+
+	if ( empty( $attachments ) )
+		return;
+
+	if ( is_feed() ) {
+		$output = "\n";
+		foreach ( $attachments as $att_id => $attachment )
+			$output .= wp_get_attachment_link( $att_id, $size, true ) . "\n";
+		return $output;
+	}
+	
+	
+
+	$itemtag	=	tag_escape( $itemtag );
+	$captiontag	=	tag_escape( $captiontag );
+	$columns	=	intval( min( array( 8, $columns ) ) );
+	$float		=	(is_rtl()) ? 'right' : 'left';
+
+	if ( 4 > $columns )
+		$size = 'full';
+	
+	$selector	=	"gallery-{$instance}";
+	$size_class	=	sanitize_html_class( $size );
+	$output		=	"<ul id='$selector' class='gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size_class} thumbnails'>";
+
+	$i = 0;
+	foreach ( $attachments as $id => $attachment ) {
+		$comments = get_comments( array(
+			'post_id'	=>	$id,
+			'count'		=>	true,
+			'type'		=>	'comment',
+			'status'	=>	'approve'
+		) );
+		
+		$link = wp_get_attachment_link( $id, $size, ! ( isset( $attr['link'] ) AND 'file' == $attr['link'] ) );
+		$clear_class = ( 0 == $i++ % $columns ) ? ' clear' : '';
+		$span = 'span' . floor( 8 / $columns );
+		
+		$output .= "<li class='{$span}{$clear_class}'><{$itemtag} class='gallery-item'>";
+		$output .= "<{$icontag} class='gallery-icon'>{$link}</{$icontag}>\n";
+			
+		if ( $captiontag AND ( 0 < $comments OR trim( $attachment->post_excerpt ) ) ) {
+			$comments	=	( 0 < $comments ) ? sprintf( _n('%d comment', '%d comments', $comments, 'the-bootstrap'), $comments ) : '';
+			$excerpt	=	wptexturize( $attachment->post_excerpt );
+			$out		=	($comments AND $excerpt) ? " $excerpt <br /> $comments " : " $excerpt$comments ";
+			$output		.=	"<{$captiontag} class='wp-caption-text gallery-caption'>{$out}</{$captiontag}>\n";
+		}
+		$output .= "</{$itemtag}></li>\n";
+	}
+	$output .= "</ul>\n";
+	
+	return $output;
+}
+add_filter( 'post_gallery', 'the_bootstrap_post_gallery', 10, 2 );
+
+
+/**
+ * HTML 5 caption for pictures
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$empty
+ * @param	array	$attr
+ * @param	string	$content
+ *
+ * @return	string
+ */
+function the_bootstrap_img_caption_shortcode( $empty, $attr, $content ) {
+
+	extract( shortcode_atts( array(
+		'id'		=>	'',
+		'align'		=>	'alignnone',
+		'width'		=>	'',
+		'caption'	=>	''
+	), $attr ) );
+
+	if ( 1 > (int) $width OR empty( $caption ) ) {
+		return $content;
+	}
+
+	if ( $id ) {
+		$id = 'id="' . $id . '" ';
+	}
+
+	return '<figure ' . $id . 'class="wp-caption thumbnail ' . $align . '" style="width: '.$width.'px;">
+				' . do_shortcode( str_replace( 'class="thumbnail', 'class="', $content ) ) . '
+				<figcaption class="wp-caption-text">' . $caption . '</figcaption>
+			</figure>';
+}
+add_filter( 'img_caption_shortcode', 'the_bootstrap_img_caption_shortcode', 10, 3 );
+
+
+/**
+ * Returns a password form which dispalys nicely with Bootstrap
+ *
+ * @author	Konstantin Obenland
+ * @since	1.0.0 - 05.02.2012
+ *
+ * @param	string	$form
+ *
+ * @return	string	The Bootstrap password form
+ */
+function the_bootstrap_the_password_form( $form ) {
+	return '<form class="post-password-form form-horizontal" action="' . home_url( 'wp-pass.php' ) . '" method="post"><legend>'. __( 'This post is password protected. To view it please enter your password below:', 'the-bootstrap' ) . '</legend><div class="control-group"><label class="control-label" for="post-password-' . get_the_ID() . '">' . __( 'Password:', 'the-bootstrap' ) .'</label><div class="controls"><input name="post_password" id="post-password-' . get_the_ID() . '" type="password" size="20" /></div></div><div class="form-actions"><button type="submit" class="post-password-submit submit btn btn-primary">' . __( 'Submit', 'the-bootstrap' ) . '</button></div></form>';
+}
+add_filter( 'the_password_form', 'the_bootstrap_the_password_form' );
+
+
+/**
+ * Modifies the category dropdown args for widgets on 404 pages
+ *
+ * @author	Konstantin Obenland
+ * @since	1.5.0 - 19.05.2012
+ *
+ * @param	array	$args
+ *
+ * @return	array
+ */
+function the_bootstrap_widget_categories_dropdown_args( $args ) {
+	if ( is_404() ) {
+		$args	=	wp_parse_args( $args, array(
+			'orderby'		=>	'count',
+			'order'			=>	'DESC',
+			'show_count'	=>	1,
+			'title_li'		=>	'',
+			'number'		=>	10
+		) );
+	}
+	return $args;
+}
+add_filter( 'widget_categories_dropdown_args', 'the_bootstrap_widget_categories_dropdown_args' );
+
+
+/**
+ * Adds the .thumbnail class when images are sent to editor
+ * 
+ * @author	Konstantin Obenland
+ * @since	2.0.0 - 29.08.2012
+ * 
+ * @param	string	$html
+ * @param	int		$id
+ * @param	string	$caption
+ * @param	string	$title
+ * @param	string	$align
+ * @param	string	$url
+ * @param	string	$size
+ * @param	string	$alt
+ * 
+ * @return	string	Image HTML
+ */
+function the_bootstrap_image_send_to_editor( $html, $id, $caption, $title, $align, $url, $size, $alt ) {
+	if ( $url ) {
+		$html = str_replace( '<a ', '<a class="thumbnail" ', $html );
+	} else {
+		$html = str_replace( 'class="', 'class="thumbnail ', $html );
+	}
+
+	return $html;
+}
+add_filter( 'image_send_to_editor', 'the_bootstrap_image_send_to_editor', 10, 8 );
+
+
+/**
+ * Adjusts content_width value for full-width and single image attachment
+ * templates, and when there are no active widgets in the sidebar.
+ *
+ * @author	WordPress.org
+ * @since	2.0.0 - 29.08.2012
+ * 
+ * @return	void
+ */
+function the_bootstrap_content_width() {
+	if ( is_attachment() ) {
+		global $content_width;
+		$content_width = 940;
+	}
+}
+add_action( 'template_redirect', 'the_bootstrap_content_width' );
+
+
+/**
+ * Returns the Theme version string
+ *
+ * @author	Konstantin Obenland
+ * @since	1.2.4 - 07.04.2012
+ * @access	private
+ *
+ * @return	string	The Bootstrap version
+ */
+function _the_bootstrap_version() {
+	
+	if ( function_exists( 'wp_get_theme' ) ) {
+		$theme_version	=	wp_get_theme()->get( 'Version' );
+	}
+	else {
+		$theme_data		=	get_theme_data( get_template_directory() . '/style.css' );
+		$theme_version	=	$theme_data['Version'];
+	}
+	
+	return $theme_version;
 }
 
-// enqueue styles
-if( !function_exists("theme_styles") ) {  
-    function theme_styles() { 
-        // This is the compiled css file from LESS - this means you compile the LESS file locally and put it in the appropriate directory if you want to make any changes to the master bootstrap.css.
-        wp_register_style( 'bootstrap', get_template_directory_uri() . '/library/css/bootstrap.css', array(), '1.0', 'all' );
-        wp_enqueue_style( 'bootstrap' );
 
-        // For child themes
-        wp_register_style( 'wpbs-style', get_stylesheet_directory_uri() . '/style.css', array(), '1.0', 'all' );
-        wp_enqueue_style( 'wpbs-style' );
-    }
-}
-add_action( 'wp_enqueue_scripts', 'theme_styles' );
-
-// enqueue javascript
-if( !function_exists( "theme_js" ) ) {  
-  function theme_js(){
-  
-    wp_register_script( 'bootstrap', 
-      get_template_directory_uri() . '/library/js/bootstrap.min.js', 
-      array('jquery'), 
-      '1.2' );
-  
-    wp_register_script( 'wpbs-scripts', 
-      get_template_directory_uri() . '/library/js/scripts.js', 
-      array('jquery'), 
-      '1.2' );
-  
-    wp_register_script(  'modernizr', 
-      get_template_directory_uri() . '/library/js/modernizr.full.min.js', 
-      array('jquery'), 
-      '1.2' );
-  
-    wp_enqueue_script('bootstrap');
-    wp_enqueue_script('wpbs-scripts');
-    wp_enqueue_script('modernizr');
-    
-  }
-}
-add_action( 'wp_enqueue_scripts', 'theme_js' );
-
-// Get <head> <title> to behave like other themes
-function wp_bootstrap_wp_title( $title, $sep ) {
-  global $paged, $page;
-
-  if ( is_feed() ) {
-    return $title;
-  }
-
-  // Add the site name.
-  $title .= get_bloginfo( 'name' );
-
-  // Add the site description for the home/front page.
-  $site_description = get_bloginfo( 'description', 'display' );
-  if ( $site_description && ( is_home() || is_front_page() ) ) {
-    $title = "$title $sep $site_description";
-  }
-
-  // Add a page number if necessary.
-  if ( $paged >= 2 || $page >= 2 ) {
-    $title = "$title $sep " . sprintf( __( 'Page %s', 'wpbootstrap' ), max( $paged, $page ) );
-  }
-
-  return $title;
-}
-add_filter( 'wp_title', 'wp_bootstrap_wp_title', 10, 2 );
-
-?>
+/* End of file functions.php */
+/* Location: ./wp-content/themes/the-bootstrap/functions.php */

@@ -1,19 +1,37 @@
-				<div id="sidebar1" class="col-sm-4" role="complementary">
-				
-					<?php if ( is_active_sidebar( 'sidebar1' ) ) : ?>
+<?php
+/** sidebar.php
+ *
+ * @author		Konstantin Obenland
+ * @package		The Bootstrap
+ * @since		1.0.0	- 05.02.2012
+ */
 
-						<?php dynamic_sidebar( 'sidebar1' ); ?>
+tha_sidebars_before(); ?>
+<section id="secondary" class="widget-area span4" role="complementary">
+	<?php tha_sidebar_top();
+	
+	if ( ! dynamic_sidebar( 'main' ) ) {
+		the_widget( 'WP_Widget_Archives', array(
+			'count'		=>	0,
+			'dropdown'	=>	0
+		), array(
+			'before_widget'	=>	'<aside id="archives" class="widget well widget_archives">',
+			'after_widget'	=>	'</aside>',
+			'before_title'	=>	'<h3 class="widget-title">',
+			'after_title'	=>	'</h3>',
+		) );
+		the_widget( 'WP_Widget_Meta', array(), array(
+			'before_widget'	=>	'<aside id="meta" class="widget well widget_meta">',
+			'after_widget'	=>	'</aside>',
+			'before_title'	=>	'<h3 class="widget-title">',
+			'after_title'	=>	'</h3>',
+		) );
+	} // end sidebar widget area
+	
+	tha_sidebar_bottom(); ?>
+</section><!-- #secondary .widget-area -->
+<?php tha_sidebars_after();
 
-					<?php else : ?>
 
-						<!-- This content shows up if there are no widgets defined in the backend. -->
-						
-						<div class="alert alert-message">
-						
-							<p><?php _e("Please activate some Widgets","wpbootstrap"); ?>.</p>
-						
-						</div>
-
-					<?php endif; ?>
-
-				</div>
+/* End of file sidebar.php */
+/* Location: ./wp-content/themes/the-bootstrap/sidebar.php */
