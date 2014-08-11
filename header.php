@@ -61,7 +61,7 @@
 									</a>
 									<?php if ( the_bootstrap_options()->navbar_site_name ) : ?>
 									<a class="brand" href="<?php echo home_url(); ?>">
-										<img src=""/>
+										<img src="<?php bloginfo('template_directory'); ?>/img/dc_logo.png" width="24px"/>
 										<?php bloginfo( 'name' ); ?>
 									</a>
 									<?php endif;?>
