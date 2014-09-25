@@ -6125,3 +6125,10 @@ button.close {
     overflow: visible !important;
   }
 }
+.widget-title {
+  margin: 0 0 10px 0;
+  text-align: center;
+}
+.widget > ul {
+  color: red;
+}
