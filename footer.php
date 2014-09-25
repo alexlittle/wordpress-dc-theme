@@ -26,10 +26,10 @@
 						<div class="span4">
 							<h4>Follow Us</h4>
 							<ul>
-								<li><a class="rss" href="<?php bloginfo('rss2_url'); ?>"><img src="<?php bloginfo('template_url'); ?>/img/feed-icon-28x28.png"/>RSS</a></li>
+								<li><a class="rss" href="<?php bloginfo('rss2_url'); ?>"><img src="<?php bloginfo('template_url'); ?>/img/rss.png"/>RSS</a></li>
 								<li><a href="https://github.com/DigitalCampus/"><img src="<?php bloginfo('template_url'); ?>/img/github-icon.png"/>GitHub</a></li>
 								<li><a href="https://twitter.com/digicampusteam" rel="nofollow"  title="Follow us on twitter."><img src="<?php bloginfo('template_url'); ?>/img/twitter.png"/>@digicampusteam</a></li>
-								<li><a href="http://www.youtube.com/user/digitalcampusteam" rel="nofollow"  title="Our YouTube channel."><img src="<?php bloginfo('template_url'); ?>/img/youtube.png"/>YouTube</a></li>
+								<li><a href="https://www.youtube.com/user/digitalcampusteam" rel="nofollow"  title="Our YouTube channel."><img src="<?php bloginfo('template_url'); ?>/img/youtube.png"/>YouTube</a></li>
 							</ul>
 						</div>
 					</div>

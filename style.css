@@ -460,6 +460,12 @@ table .label {
 	}
 }
 
+#footer-info {
+	font: 500 11px  Verdana, Arial, Helvetica, sans-serif;
+	color: #838383;
+	padding: 20px;
+	text-align:center
+}
 
 /* End of file style.css */
 /* Location: ./wp-content/themes/the-bootstrap/style.css */
