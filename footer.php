@@ -8,26 +8,34 @@
 
 				tha_footer_before(); ?>
 				<footer id="colophon" role="contentinfo" class="span12">
-					<?php tha_footer_top(); ?>
-					<div id="page-footer" class="well clearfix">
-						<?php wp_nav_menu( array(
-							'container'			=>	'nav',
-							'container_class'	=>	'subnav',
-							'theme_location'	=>	'footer-menu',
-							'menu_class'		=>	'credits nav nav-pills pull-left',
-							'depth'				=>	3,
-							'fallback_cb'		=>	'the_bootstrap_credits',
-							'walker'			=>	new The_Bootstrap_Nav_Walker,
-						) );
-						?>
-						<div id="site-generator"<?php echo has_nav_menu('footer-menu') ? ' class="footer-nav-menu"' : ''; ?>>
-							<a	href="<?php echo esc_url( __( 'http://wordpress.org/', 'the-bootstrap' ) ); ?>"
-								title="<?php esc_attr_e( 'Semantic Personal Publishing Platform', 'the-bootstrap' ); ?>"
-								target="_blank"
-								rel="generator"><?php printf( _x( 'Proudly powered by %s', 'WordPress', 'the-bootstrap' ), 'WordPress' ); ?></a>
+					<div class="row">
+						<div class="span4">
+							<h4>Contact Us</h4>
+							<ul>
+								<li><a href="mailto:alex@digital-campus.org">alex@digital-campus.org</a></li>
+							</ul>
 						</div>
-					</div><!-- #page-footer .well .clearfix -->
-					<?php tha_footer_bottom(); ?>
+						<div class="span4">
+							<h4>About Us</h4>
+							<ul>
+								<li><a href="/team/">Team</a></li>
+								<li><a href="/team/advisory-board/">Advisory Board</a></li>
+								<li><a href="/privacy/">Privacy</a></li>
+							</ul>
+						</div>
+						<div class="span4">
+							<h4>Follow Us</h4>
+							<ul>
+								<li><a class="rss" href="<?php bloginfo('rss2_url'); ?>"><img src="<?php bloginfo('template_url'); ?>/img/feed-icon-28x28.png"/>RSS</a></li>
+								<li><a href="https://github.com/DigitalCampus/"><img src="<?php bloginfo('template_url'); ?>/img/github-icon.png"/>GitHub</a></li>
+								<li><a href="https://twitter.com/digicampusteam" rel="nofollow"  title="Follow us on twitter."><img src="<?php bloginfo('template_url'); ?>/img/twitter.png"/>@digicampusteam</a></li>
+								<li><a href="http://www.youtube.com/user/digitalcampusteam" rel="nofollow"  title="Our YouTube channel."><img src="<?php bloginfo('template_url'); ?>/img/youtube.png"/>YouTube</a></li>
+							</ul>
+						</div>
+					</div>
+					<div id="footer-info">		
+						Digital Campus Ltd is a not-for-profit company registered in England & Wales (Company No. 7629751). &copy; <?php echo date('Y'); ?> <?php echo($options['footer_text']); ?>
+					</div>
 				</footer><!-- #colophon -->
 				<?php tha_footer_after(); ?>
 			</div><!-- #page -->
