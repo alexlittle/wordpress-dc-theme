@@ -537,9 +537,9 @@ add_action( 'comment_form_comments_closed', 'the_bootstrap_comments_list', 1 );
  * @return	void
  */
 function the_bootstrap_comments_closed() {
-	if ( ! is_page() AND post_type_supports( get_post_type(), 'comments' ) ) : ?>
-		<p class="nocomments"><?php _e( 'Comments are closed.', 'the-bootstrap' ); ?></p>
-	<?php endif;
+	if ( ! is_page() AND post_type_supports( get_post_type(), 'comments' ) ) : 
+		//<p class="nocomments"><?php _e( 'Comments are closed.', 'the-bootstrap' ); </p>
+	endif;
 }
 add_action( 'comment_form_comments_closed', 'the_bootstrap_comments_closed' );
 
