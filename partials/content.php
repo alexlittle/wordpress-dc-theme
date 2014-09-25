@@ -21,6 +21,11 @@ tha_entry_before(); ?>
 		</hgroup>
 	<?php
 		else :
+			if ( has_post_thumbnail() ) : ?>
+			<a class="thumbnail post-thumbnail span2" href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>">
+				<?php the_post_thumbnail( 'thumbnail' ); ?>
+			</a>
+			<?php endif;
 			the_title( '<h1 class="entry-title"><a href="' . get_permalink() .'" title="' . sprintf( esc_attr__( 'Permalink to %s', 'the-bootstrap' ), the_title_attribute( 'echo=0' ) ) . '" rel="bookmark">', '</a></h1>' );
 		endif;
 		
@@ -29,6 +34,7 @@ tha_entry_before(); ?>
 			<?php the_bootstrap_posted_on(); ?>
 		</div><!-- .entry-meta -->
 		<?php endif; ?>
+		<div style="clear:both"></div>
 	</header><!-- .entry-header -->
 
 	<?php if ( is_search() ) : // Only display Excerpts for Search ?>
@@ -37,11 +43,7 @@ tha_entry_before(); ?>
 	</div><!-- .entry-summary -->
 	<?php else : ?>
 	<div class="entry-content clearfix">
-		<?php if ( has_post_thumbnail() ) : ?>
-		<a class="thumbnail post-thumbnail span2" href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>">
-			<?php the_post_thumbnail( 'thumbnail' ); ?>
-		</a>
-		<?php endif;
+		<?php
 		the_content( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) );
 		the_bootstrap_link_pages(); ?>
 	</div><!-- .entry-content -->

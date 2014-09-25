@@ -14,8 +14,14 @@ tha_entry_before(); ?>
 	<?php tha_entry_top(); ?>
 	
 	<header class="page-header">
-		<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
+		<?php if ( has_post_thumbnail() ) : ?>
+			<a class="thumbnail post-thumbnail span2" href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>">
+				<?php the_post_thumbnail( 'thumbnail' ); ?>
+			</a>
+			<?php  endif;
+		    the_title( '<h1 class="entry-title">', '</h1>' ); ?>
 		<div class="entry-meta"><?php the_bootstrap_posted_on(); ?></div><!-- .entry-meta -->
+		<div style="clear:both"></div>
 	</header><!-- .entry-header -->
 
 	<div class="entry-content clearfix">

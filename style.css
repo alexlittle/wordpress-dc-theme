@@ -188,8 +188,13 @@ article.page {
 /* =Images
 -------------------------------------------------------------- */
 
-.entry-content .post-thumbnail {
+header.page-header > a.post-thumbnail {
 	margin: 0 20px 20px 0;
+	float: left;
+}
+
+header.page-header > h1.entry-title {
+	display: inline;
 }
 
 .entry-attachment .thumbnail.attachment-table {
