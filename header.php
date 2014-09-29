@@ -21,6 +21,17 @@
 		
 		<?php tha_head_bottom(); ?>
 		<?php wp_head(); ?>
+		<script type="text/javascript"> 
+
+		 /*$(document).ready(function(){
+			    $('.carousel').carousel({
+			      interval: 2000
+			    });
+			  });*/
+			
+		    
+		    
+		</script>
 	</head>
 	
 	<body <?php body_class(); ?>>

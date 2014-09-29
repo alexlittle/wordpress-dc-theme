@@ -4990,6 +4990,7 @@ a.thumbnail:hover {
 .carousel-caption p {
   color: #ffffff;
   line-height: 20px;
+  text-align: center;
 }
 .carousel-caption h4 {
   margin: 0 0 5px;
