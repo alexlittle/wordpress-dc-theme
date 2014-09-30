@@ -14,7 +14,14 @@ tha_entry_before(); ?>
 	<?php tha_entry_top(); ?>
 	
 	<header class="page-header">
-		<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
+		<h1 class="entry-title">
+			<?php 
+				if ( is_page() && $post->post_parent > 0 ) { 
+    				echo get_the_title($post->post_parent);
+    				echo " &gt; ";
+				}			
+			the_title(); ?>
+		</h1>
 	</header><!-- .entry-header -->
 
 	<div class="entry-content clearfix">
