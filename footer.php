@@ -18,8 +18,8 @@
 						<div class="span4">
 							<h4>About Us</h4>
 							<ul>
-								<li><a href="/team/">Team</a></li>
-								<li><a href="/team/advisory-board/">Advisory Board</a></li>
+								<li><a href="/about/our-team/">Team</a></li>
+								<li><a href="/about/advisory-board/">Advisory Board</a></li>
 								<li><a href="/privacy/">Privacy</a></li>
 							</ul>
 						</div>
