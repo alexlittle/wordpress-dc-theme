@@ -309,6 +309,9 @@ table .label {
 	background-color: #FFFFFF;
 }
 
+blockquote p {
+    margin-bottom: 15px;
+}
 
 /* =WordPress Core
 -------------------------------------------------------------- */
