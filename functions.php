@@ -218,6 +218,8 @@ function the_bootstrap_register_scripts_styles() {
 		$theme_version = _the_bootstrap_version();
 		$suffix = ( defined('SCRIPT_DEBUG') AND SCRIPT_DEBUG ) ? '' : '.min';
 			
+		$suffix="";
+		
 		/**
 		 * Scripts
 		 */
