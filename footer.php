@@ -19,7 +19,6 @@
 							<h4>About Us</h4>
 							<ul>
 								<li><a href="/about/our-team/">Team</a></li>
-								<li><a href="/about/advisory-board/">Advisory Board</a></li>
 								<li><a href="/privacy/">Privacy</a></li>
 							</ul>
 						</div>
@@ -32,9 +31,6 @@
 								<li><a href="https://www.youtube.com/user/digitalcampusteam" rel="nofollow"  title="Our YouTube channel."><img src="<?php bloginfo('template_url'); ?>/img/youtube.png"/>YouTube</a></li>
 							</ul>
 						</div>
-					</div>
-					<div id="footer-info">		
-						Digital Campus Ltd is a not-for-profit company registered in England & Wales (Company No. 7629751). &copy; <?php echo date('Y'); ?> <?php echo($options['footer_text']); ?>
 					</div>
 				</footer><!-- #colophon -->
 				<?php tha_footer_after(); ?>
